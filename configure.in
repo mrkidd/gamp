@@ -18,7 +18,13 @@ AC_SUBST(GNOME_LIBS)
 AC_SUBST(GNOME_CFLAGS)
 dnl Checks for programs.
 dnl Checks for libraries.
-PKG_CHECK_MODULES(GST,gstreamer-0.6 gstreamer-gconf-0.6,,exit)
+
+GST_MAJORMINOR=0.7
+PKG_CHECK_MODULES(GST,gstreamer-$GST_MAJORMINOR gstreamer-gconf-$GST_MAJORMINOR,HAVE_GST=yes,HAVE_GST=no)
+if test "x$HAVE_GST_7" = "xno"; then
+	GST_MAJORMINOR=0.6
+	PKG_CHECK_MODULES(GST,gstreamer-0.6 gstreamer-gconf-0.6,HAVE_GST=yes,HAVE_GST=no)
+fi
 CFLAGS="$CFLAGS $GST_CFLAGS"
 CPPFLAGS="$CPPFLAGS $GST_CFLAGS"
 LDFLAGS="$LDFLAGS $GST_LIBS"
