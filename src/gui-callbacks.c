@@ -55,11 +55,25 @@ void on_button_save_clicked (GtkButton *button, gpointer user_data);
 void on_button_clear_clicked (GtkButton *button, gpointer user_data);
 void on_button_close_clicked (GtkButton *button, gpointer user_data);
 
+gboolean on_hscale_progress_button_press_event (GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+gboolean on_hscale_progress_button_release_event (GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+gboolean on_hscale_progress_motion_notify_event (GtkWidget *widget, GdkEventMotion *event, gpointer user_data);
+void on_hscale_progress_value_changed (GtkRange *range, gpointer user_data);
+gboolean slider_moved_cb (GtkAdjustment *adjust);
+gboolean changed_idle_cb (GtkRange *range);
+
 gboolean cb_file_open (GtkDialog *dialog, int response_id, gboolean clear);
 void cb_file_add (GtkWidget *widget, gpointer user_data);
 void cb_playlist_load (GtkWidget *widget, gpointer user_data);
 
 gboolean gap_add_files (char *title, GtkWindow *parent, gboolean clear_playlist);
+
+gboolean slider_dragging = FALSE;
+gboolean slider_locked = FALSE;
+long latest_set_time = -1;
+long elapsed = 0;
+guint slider_moved_timeout = 0;
+guint value_changed_update_handler = 0;
 
 gboolean gap_add_files (char *title, GtkWindow *parent, gboolean clear_playlist)
 {
@@ -431,4 +445,121 @@ void update_currently_playing (char *title, gboolean get_info)
 void cb_gap_player_eos (GAPPlayer *gp)
 {
 	playlist_next ();
+}
+
+gboolean
+on_hscale_progress_button_press_event (GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+{
+	g_print ("Entered button press event\n");
+	
+	slider_dragging = TRUE;
+	latest_set_time = -1;
+	
+	return FALSE;
+}
+
+gboolean
+on_hscale_progress_button_release_event (GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+{
+	gdouble progress;
+	long duration, new;
+	GtkAdjustment *adjustment;
+
+	g_printf ("entered button release event, %d\n", slider_dragging);
+	
+	if (slider_dragging == FALSE)
+		return FALSE;
+
+	adjustment = gtk_range_get_adjustment (GTK_RANGE (widget));
+	
+	progress = gtk_adjustment_get_value (adjustment);
+	g_printf ("progress: %lf\n", progress);
+	duration = gap_get_duration (gamp_gp);
+	g_printf ("duration: %ld\n", duration);
+	new = (long) (progress * duration);
+	g_printf ("new: %ld\n", new);
+
+	if (new != latest_set_time)
+		gap_set_time (gamp_gp, new);
+		
+	slider_dragging = FALSE;
+
+	/* sync time */
+
+	if (slider_moved_timeout !=0)
+	{
+		g_source_remove (slider_moved_timeout);
+		slider_moved_timeout = 0;
+	}
+	
+	return FALSE;
+}
+
+gboolean
+on_hscale_progress_motion_notify_event (GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
+{
+	GtkAdjustment *adjustment;
+	double progress;
+	long duration;
+	
+	if (slider_dragging == FALSE)
+		return FALSE;
+		
+	adjustment = gtk_range_get_adjustment (GTK_RANGE (widget));
+	
+	progress = gtk_adjustment_get_value (adjustment);
+	duration = gap_get_duration (gamp_gp);
+	
+	elapsed = (long) (progress * duration);
+	
+	/* update elapsed */
+	
+	if (slider_moved_timeout != 0)
+	{
+		g_source_remove (slider_moved_timeout);
+		slider_moved_timeout = 0;
+	}
+	slider_moved_timeout = g_timeout_add (40, (GSourceFunc) slider_moved_cb, adjustment);
+	
+	return FALSE;
+}
+
+void
+on_hscale_progress_value_changed (GtkRange *range, gpointer user_data)
+{
+	g_print ("Entered value changed event\n");
+
+	if ((slider_dragging == FALSE) && (slider_locked == FALSE) && (value_changed_update_handler == 0))
+	{
+		slider_dragging = TRUE;
+		value_changed_update_handler = g_idle_add ((GSourceFunc) changed_idle_cb, range);
+	}
+}
+
+gboolean
+changed_idle_cb (GtkRange *range)
+{
+	on_hscale_progress_button_release_event (GTK_WIDGET (range), NULL, NULL);
+	
+	value_changed_update_handler = 0;
+	g_print ("in changed_idle_cb\n");
+	
+	return FALSE;
+}
+
+gboolean
+slider_moved_cb (GtkAdjustment *adjust)
+{
+	double progress;
+	long duration, new;
+	
+	progress = gtk_adjustment_get_value (adjust);
+	duration = gap_get_duration (gamp_gp);
+	new = (long) (progress * duration);
+	
+	gap_set_time (gamp_gp, new);
+	
+	latest_set_time = new;
+	
+	return FALSE;
 }

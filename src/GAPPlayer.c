@@ -43,6 +43,7 @@ struct GAPPlayerPrivate
 	GstElement *audiosink;
 	
 	char *vfsuri;
+	long duration;
 	
 	gboolean playing;
 	gboolean mute;
@@ -123,8 +124,9 @@ GAPPlayer *gap_player_new (void)
 
 static gboolean gap_idle_handler (gpointer data)
 {
-	GstElement *gst_pipeline = GST_ELEMENT (data);
-
+	GAPPlayer *gp = GAP_PLAYER (data);
+	GstElement *gst_pipeline = GST_ELEMENT (gp->_priv->pipeline);
+	
 	return gst_bin_iterate (GST_BIN (gst_pipeline));
 }
 
@@ -201,6 +203,8 @@ void gap_open (GAPPlayer *gp, char *vfsuri)
 	g_object_set (G_OBJECT (gp->_priv->filesrc), "iradio-mode", iradio_mode, NULL);
 	g_object_set (G_OBJECT (gp->_priv->filesrc), "location", vfsuri, NULL);
 	gp->_priv->vfsuri = g_strdup (vfsuri);
+	
+	gap_get_metadata (gp, NULL, NULL, NULL);
 }
 
 void gap_play (GAPPlayer *gp)
@@ -208,7 +212,7 @@ void gap_play (GAPPlayer *gp)
 	gst_element_set_state (gp->_priv->pipeline, GST_STATE_PLAYING);
 	gp->_priv->playing = TRUE;
 	
-	g_idle_add ((GSourceFunc) gap_idle_handler, gp->_priv->pipeline);
+	g_idle_add ((GSourceFunc) gap_idle_handler, gp);
 	g_signal_connect (G_OBJECT (gp->_priv->audiosink), "eos", G_CALLBACK (eos_signal_cb), gp);
 }
 
@@ -247,15 +251,25 @@ void gap_close (GAPPlayer *gp)
 	g_object_unref (G_OBJECT (gp->_priv->filesrc));
 }
 
+long gap_get_duration (GAPPlayer *gp)
+{
+	return gp->_priv->duration;
+}
+
 long gap_get_time (GAPPlayer *gp)
 {
 	GstClock *gst_clock;
 	long time;
 	
 	g_return_val_if_fail (IS_GAP_PLAYER (gp), -1);
-	
-	gst_clock = gst_bin_get_clock (GST_BIN (gp->_priv->pipeline));
-	time = (long) gst_clock_get_time (gst_clock);
+
+	if (gp->_priv->pipeline != NULL)
+	{	
+		gst_clock = gst_bin_get_clock (GST_BIN (gp->_priv->pipeline));
+		time = (long) gst_clock_get_time (gst_clock);
+	}
+	else
+		time = -1;
 	
 	return time;
 }
@@ -267,8 +281,11 @@ void gap_set_time (GAPPlayer *gp, long time)
 	g_return_if_fail (IS_GAP_PLAYER (gp));
 	g_return_if_fail (time >= 0);
 	
+	g_return_if_fail (gp->_priv->pipeline != NULL);
+	
 	gst_element_set_state (gp->_priv->pipeline, GST_STATE_PAUSED);
-	gst_event = gst_event_new_seek (GST_SEEK_METHOD_SET | GST_SEEK_FLAG_FLUSH, time);
+	gst_event = gst_event_new_seek (GST_FORMAT_TIME | GST_SEEK_METHOD_SET | GST_SEEK_FLAG_FLUSH,
+									time * GST_SECOND);
 	gst_element_send_event (gp->_priv->audiosink, gst_event);
 	
 	if (gp->_priv->playing == TRUE)
@@ -281,9 +298,15 @@ void gap_get_metadata (GAPPlayer *gp, char **artist, char **title, long *duratio
 
 	gapmd = g_new0 (GAPMetaData, 1);
 	gap_metadata_load (gapmd, gp->_priv->vfsuri);
-	*artist = g_strdup (gapmd->artist);
-	*title = g_strdup (gapmd->title);
-	*duration = gapmd->duration;
+	if (artist != NULL)
+		*artist = g_strdup (gapmd->artist);
+	if (title != NULL)
+		*title = g_strdup (gapmd->title);
+	if (duration != NULL)
+		*duration = gapmd->duration;
+	gp->_priv->duration = gapmd->duration;
+	g_printf ("get_metadata duration: %d; gp duration: %d\n", gapmd->duration, gp->_priv->duration);
+
 	g_free (gapmd);
 }
 

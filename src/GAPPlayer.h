@@ -69,6 +69,7 @@ void gap_close (GAPPlayer *gp);
 void gap_get_metadata (GAPPlayer *gp, char **artist, char **title, long *duration);
 void gap_get_metadata_uri (const char *uri, char **artist, char **title, long *duration);
 
+long gap_get_duration (GAPPlayer *gp);
 long gap_get_time (GAPPlayer *gp);
 void gap_set_time (GAPPlayer *gp, long time);
 

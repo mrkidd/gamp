@@ -1,3 +1,8 @@
+2004-04-15  Mason Kidd  <mrkidd@mrkidd.com>
+
+	* src/GAPPlayer.c,.h: Add duration property and get function
+	* src/gui-callbacks.c, gamp.glade: Add code to enable the time slider
+	
 2004-04-12  Mason Kidd  <mrkidd@mrkidd.com>
 
 	* src/gui-callbacks.c: Fix segfault with clearing playlist when opening file
