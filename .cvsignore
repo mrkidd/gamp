@@ -28,8 +28,5 @@ autom4te*.cache
 autom4te.cache
 autom4te.cache/*
 .tm_project.cache
-gamp.desktop
 gamp.spec
 gamp.schemas
-gamp.gladep
-open-location.gladep

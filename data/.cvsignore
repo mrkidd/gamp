@@ -1,5 +1,7 @@
-data/gamp.desktop
-data/gamp.applications
-data/Makefile.in
-data/Makefile
+gamp.desktop
+gamp.applications
+Makefile.in
+Makefile
+gamp.gladep
+gamp.glade.bak
 
