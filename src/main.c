@@ -164,9 +164,8 @@ main (int argc, char *argv[])
 	gamp_gp = gap_player_new();
 	
 	glade_xml_signal_autoconnect (xml);
-	main_window = glade_xml_get_widget (xml, "window1");
+	main_window = glade_xml_get_widget (xml, "window_main");
 	gtk_drag_dest_set (main_window, GTK_DEST_DEFAULT_ALL, target_uri, 1, GDK_ACTION_COPY);
-	playlist_window = glade_xml_get_widget (xml, "window_playlist");
 
 	gtk_widget_show_all (main_window);
 

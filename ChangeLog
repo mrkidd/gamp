@@ -1,3 +1,10 @@
+2004-05-15  Mason Kidd  <mrkidd@mrkidd.com>
+
+	* gamp.glade, src/main.c: Remove playlist window, put playlist treeview under GtkExpander
+	in main window.  Cleanup the main window.  Fix the menus, add Playlist TLM.
+	* src/gui-callbacks.c: Add menu callbacks for Playlist TLM, add code for expander.
+	* src/playlist.c: Get metadata for file when adding to playlist.
+	
 2004-05-02  Mason Kidd  <mrkidd@mrkidd.com>
 
 	* pixmaps/gamp_icon.png: Remove, not needed

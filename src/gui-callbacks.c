@@ -32,9 +32,17 @@
 void on_open1_activate (GtkMenuItem *menuitem, gpointer user_data);
 void on_open_location1_activate (GtkButton *button, gpointer user_data);
 void on_quit1_activate (GtkMenuItem *menuitem, gpointer user_data);
+
+void on_open2_activate (GtkMenuItem *menuitem, gpointer user_data);
+void on_save1_activate (GtkMenuItem *menuitem, gpointer user_data);
+void on_clear1_activate (GtkMenuItem *menuitem, gpointer user_data);
+void on_add_file1_activate (GtkMenuItem *menuitem, gpointer user_data);
+void on_remove_file1_activate (GtkMenuItem *menuitem, gpointer user_data);
+
 void on_about1_activate (GtkMenuItem *menuitem, gpointer user_data);
-gboolean on_window1_delete_event (GtkWidget *widget, GdkEvent *event, gpointer user_data);
-gboolean on_window_playlist_delete_event (GtkWidget *widget, GdkEvent *event, gpointer user_data);
+
+gboolean on_window_main_delete_event (GtkWidget *widget, GdkEvent *event, gpointer user_data);
+void on_expander_playlist_activate (GtkExpander *expander, gpointer user_data);
 
 void on_button_previous_clicked (GtkButton *button, gpointer user_data);
 void on_button_play_clicked (GtkButton *button, gpointer user_data);
@@ -45,17 +53,13 @@ void on_button_eject_clicked (GtkButton *button, gpointer user_data);
 void on_togglebutton_shuffle_toggled (GtkToggleButton *togglebutton, gpointer user_data);
 void on_togglebutton_repeat_toggled (GtkToggleButton *togglebutton, gpointer user_data);
 void on_togglebutton_equalizer_toggled (GtkToggleButton *togglebutton, gpointer user_data);
-void on_togglebutton_playlist_toggled (GtkToggleButton *togglebutton, gpointer user_data);
 
 void on_treeview_playlist_row_activated (GtkTreeView *treeview, GtkTreePath *arg1, GtkTreeViewColumn *arg2, gpointer user_data);
 gboolean on_treeview_playlist_drag_drop (GtkWidget *wid, GdkDragContext *context, gint x, gint y, guint time, gpointer user_dat);
 void on_treeview_playlist_drag_data_received (GtkWidget *wid, GdkDragContext *context, gint x, gint y, GtkSelectionData *data, guint info, guint time, gpointer user_dat);
 void on_button_add_clicked (GtkButton *button, gpointer user_data);
 void on_button_remove_clicked (GtkButton *button, gpointer user_data);
-void on_button_open_clicked (GtkButton *button, gpointer user_data);
-void on_button_save_clicked (GtkButton *button, gpointer user_data);
 void on_button_clear_clicked (GtkButton *button, gpointer user_data);
-void on_button_close_clicked (GtkButton *button, gpointer user_data);
 
 void cb_gap_player_tick (GAPPlayer *gp);
 void sync_time (GtkAdjustment *adjust);
@@ -72,8 +76,8 @@ void cb_playlist_load (GtkWidget *widget, gpointer user_data);
 
 gboolean gap_add_files (char *title, GtkWindow *parent, gboolean clear_playlist);
 
-gboolean on_window1_drag_drop (GtkWidget *wid, GdkDragContext *context, gint x, gint y, guint time, gpointer user_data);
-void on_window1_drag_data_received (GtkWidget *wid, GdkDragContext *context, gint x, gint y, GtkSelectionData *data, guint info, guint time, gpointer user_data);
+gboolean on_window_main_drag_drop (GtkWidget *wid, GdkDragContext *context, gint x, gint y, guint time, gpointer user_data);
+void on_window_main_drag_data_received (GtkWidget *wid, GdkDragContext *context, gint x, gint y, GtkSelectionData *data, guint info, guint time, gpointer user_data);
 
 gboolean slider_dragging = FALSE;
 gboolean slider_locked = FALSE;
@@ -181,6 +185,34 @@ void on_quit1_activate (GtkMenuItem *menuitem, gpointer user_data)
 	gtk_main_quit ();
 }
 
+void on_open2_activate (GtkMenuItem *menuitem, gpointer user_data)
+{
+	gboolean files_added;
+	
+	files_added = gap_add_files (_("Open Playlist..."), GTK_WINDOW (main_window), TRUE);
+}
+
+void on_save1_activate (GtkMenuItem *menuitem, gpointer user_data)
+{
+}
+
+void on_clear1_activate (GtkMenuItem *menuitem, gpointer user_data)
+{
+	playlist_clear ();
+}
+
+void on_add_file1_activate (GtkMenuItem *menuitem, gpointer user_data)
+{
+	gboolean files_added;
+	
+	files_added = gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window), FALSE);
+}
+
+void on_remove_file1_activate (GtkMenuItem *menuitem, gpointer user_data)
+{
+	playlist_remove_selected (playlist_treeview);
+}
+
 void on_about1_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
 	static GtkWidget *about = NULL;
@@ -223,21 +255,21 @@ void on_about1_activate (GtkMenuItem *menuitem, gpointer user_data)
 	gtk_widget_show (about);
 }
 
-gboolean on_window1_delete_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
+gboolean on_window_main_delete_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
 	gtk_main_quit ();
 	
 	return FALSE;
 }
 
-gboolean on_window_playlist_delete_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)
+void on_expander_playlist_activate (GtkExpander *expander, gpointer user_data)
 {
-	GtkWidget *tbutton;
+	gtk_expander_set_use_underline (expander, TRUE);
 	
-	tbutton = glade_xml_get_widget (xml, "togglebutton_playlist");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (tbutton), FALSE);
-	
-	return TRUE;
+	if (gtk_expander_get_expanded (expander))
+		gtk_expander_set_label (expander, _("Show _Playlist"));
+	else
+		gtk_expander_set_label (expander, _("Hide _Playlist"));
 }
 
 void on_button_previous_clicked (GtkButton *button, gpointer user_data)
@@ -279,14 +311,6 @@ void on_togglebutton_repeat_toggled (GtkToggleButton *togglebutton, gpointer use
 
 void on_button_volume_clicked (GtkButton *button, gpointer user_data)
 {
-}
-
-void on_togglebutton_playlist_toggled (GtkToggleButton *togglebutton, gpointer user_data)
-{
-	if (GTK_WIDGET_VISIBLE (playlist_window))
-		gtk_widget_hide (playlist_window);
-	else
-		gtk_widget_show (playlist_window);
 }
 
 void on_treeview_playlist_row_activated (GtkTreeView *treeview, GtkTreePath *arg1, GtkTreeViewColumn *arg2, gpointer user_data)
@@ -396,28 +420,9 @@ void on_button_remove_clicked (GtkButton *button, gpointer user_data)
 	playlist_remove_selected (playlist_treeview);
 }
 
-void on_button_open_clicked (GtkButton *button, gpointer user_data)
-{
-	gboolean files_added;
-	
-	files_added = gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window), TRUE);
-}
-
-void on_button_save_clicked (GtkButton *button, gpointer user_data)
-{
-}
-
 void on_button_clear_clicked (GtkButton *button, gpointer user_data)
 {
 	playlist_clear ();
-}
-
-void on_button_close_clicked (GtkButton *button, gpointer user_data)
-{
-	GtkWidget *tbutton;
-	
-	tbutton = glade_xml_get_widget (xml, "togglebutton_playlist");
-	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (tbutton), FALSE);
 }
 
 gboolean
@@ -634,7 +639,7 @@ slider_moved_cb (GtkAdjustment *adjust)
 }
 
 gboolean
-on_window1_drag_drop (GtkWidget *wid, GdkDragContext *context, gint x, gint y, guint time, gpointer user_data)
+on_window_main_drag_drop (GtkWidget *wid, GdkDragContext *context, gint x, gint y, guint time, gpointer user_data)
 {
 	GdkAtom target;
 	
@@ -652,7 +657,7 @@ on_window1_drag_drop (GtkWidget *wid, GdkDragContext *context, gint x, gint y, g
 }
 
 void
-on_window1_drag_data_received (GtkWidget *wid, GdkDragContext *context, gint x, gint y, GtkSelectionData *data, guint info, guint time, gpointer user_data)
+on_window_main_drag_data_received (GtkWidget *wid, GdkDragContext *context, gint x, gint y, GtkSelectionData *data, guint info, guint time, gpointer user_data)
 {
 	GList *list = NULL, *p = NULL;
 	GSList *file_list = NULL, *uris = NULL;

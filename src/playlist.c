@@ -74,7 +74,7 @@ void playlist_add_pls (char *uri)
 	char *file_contents, **file_lines, *delimiter, **file_line;
 	
 	vfs_result = gnome_vfs_read_entire_file (uri, &file_size, &file_contents);
-	//check return
+	/* check return */
 
 	delimiter = "\n";
 	file_lines = g_strsplit (file_contents, delimiter, 0);
@@ -97,7 +97,19 @@ void playlist_add_pls (char *uri)
 	{
 		file_line = g_strsplit (file_lines[i], "=", 2);
 		if (g_ascii_strncasecmp (file_line[0], "file", 4) == 0)
-			playlist_add_item (file_line[1], "0:00", file_line[1]);
+		{
+			char *t_artist = NULL, *t_title = NULL, *t_format = NULL;
+			long t_duration;
+			char *s_duration;
+                                 
+			gap_get_metadata_uri (file_line[1], &t_artist, &t_title, &t_duration);
+			t_format = g_strdup_printf ("%s - %s", t_artist, t_title);
+			s_duration = g_strdup_printf ("%d:%02d", t_duration / 60, t_duration %60);
+			playlist_add_item (t_format, s_duration, file_line[1]);
+			g_free (t_format);
+			g_free (t_artist);
+			g_free (t_title);
+		}
 	}
 	
 	g_strfreev (file_lines);
