@@ -1,7 +1,7 @@
 gamp_pixmapsdir = $(pkgdatadir)/pixmaps
 
 gamp_pixmaps_DATA = \
-	gamp_icon.png\
+	gamp-eject.png\
 	gamp-next.png\
 	gamp-pause.png\
 	gamp-play.png\

@@ -1,10 +1,11 @@
-
 [Desktop Entry]
-Name=Audio Player
-Comment=gamp Audio Player
+_Name=Gamp Audio Player
+_GenericName=Audio Player
+_Comment=Play your music files
 Exec=gamp
-Icon=@PACKAGE_PIXMAPS_DIR@/gamp.png
+Icon=gamp.png
 Terminal=false
 MultipleArgs=false
 Type=Application
-
+Categories=GNOME;Application;AudioVideo;X-Ximian-Main;X-Red-Hat-Base;
+StartupNotify=True

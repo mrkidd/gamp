@@ -40,25 +40,23 @@ int main (int argc, char *argv[])
 	char *mime_type;
 	gint i;
 	
-	#ifdef ENABLE_NLS
-		bindtextdomain (GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR);
-		textdomain (PACKAGE);
-	#endif
+	bindtextdomain (GETTEXT_PACKAGE, GNOMELOCALEDIR);
+	textdomain (PACKAGE);
 	
 	static const struct poptOption options[] = {
 		  {NULL, '\0', 0, NULL, 0, NULL, NULL}
 	};
 
-	p = gnome_program_init (PACKAGE, VERSION, LIBGNOMEUI_MODULE, argc, argv, GNOME_PARAM_POPT_TABLE, options, NULL);
+	p = gnome_program_init (PACKAGE, VERSION, LIBGNOMEUI_MODULE,
+				argc, argv, GNOME_PARAM_POPT_TABLE,
+				options, NULL);
 	glade_gnome_init ();
 	gst_init (&argc, &argv);
 	gnome_vfs_init ();
 	/*
 	 * The .glade filename should be on the next line.
 	 */
-	xml = glade_xml_new (PACKAGE_SOURCE_DIR"/data/gamp.glade", NULL, NULL);
-	if (xml == NULL)
-		xml = glade_xml_new (PACKAGE_DATA_DIR"/gamp.glade", NULL, NULL);
+	xml = glade_xml_new (DATADIR "/gamp/gamp.glade", NULL, NULL);
 	
 	gamp_gp = gap_player_new();
 	
