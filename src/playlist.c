@@ -44,11 +44,12 @@ void playlist_create_list (GtkTreeView *treeview)
 
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("Title", renderer, "text", COLUMN_TITLE, NULL);
+	gtk_tree_view_column_set_expand (column, TRUE);
 	gtk_tree_view_append_column (treeview, column);	
 
 	renderer = gtk_cell_renderer_text_new ();
 	column = gtk_tree_view_column_new_with_attributes ("Time", renderer, "text", COLUMN_TIME, NULL);
-	gtk_tree_view_append_column (treeview, column);	
+	gtk_tree_view_append_column (treeview, column);
 }
 
 void playlist_add_item (char *title, char *time, char *uri)
