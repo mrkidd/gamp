@@ -23,6 +23,7 @@
 #include <gst/media-info/media-info.h>
 
 #include "GAPPlayer.h"
+#include "gap-metadata.h"
 
 static void gap_player_class_init (GAPPlayerClass *klass);
 static void gap_player_init (GAPPlayer *gp);
@@ -143,10 +144,8 @@ static void gap_player_construct (GAPPlayer *gp)
 	g_object_set (G_OBJECT (gp->_priv->filesrc), "location", NULL, NULL);
 	
 	gp->_priv->decoder = gst_element_factory_make ("spider", "autoplugger");
-	// check if NULL
 	
 	gp->_priv->audiosink = gst_gconf_get_default_audio_sink ();
-	// check if NULL
 	
 	gst_bin_add_many (GST_BIN (gp->_priv->pipeline), gp->_priv->filesrc, gp->_priv->decoder, gp->_priv->audiosink, NULL);
 	gst_element_link_many (gp->_priv->filesrc, gp->_priv->decoder, gp->_priv->audiosink, NULL);
@@ -233,39 +232,10 @@ void gap_set_time (GAPPlayer *gp, long time)
 
 void gap_get_metadata (GAPPlayer *gp)
 {
-/*	const GList *pads_list;
-	GstCaps *caps;
+	GAPMetaData *gapmd;
 
-	artist = g_strdup_printf ("Korn");
-	title = g_strdup_printf ("Blah");
-	g_print ("%s\n", gst_object_get_path_string (GST_OBJECT (gp->_priv->decoder)));
-
-	GstCaps *caps_metadata;
-	GstProps *props_metadata;
-	const GList *props_list;
-	GstElement *element;
-
-	element = gst_bin_get_by_name (GST_BIN (gp->_priv->decoder), "src_0");
-	g_object_get (G_OBJECT (element), "metadata", &caps_metadata, NULL);
-	props_metadata = gst_caps_get_props (caps_metadata);
-	props_list = props_metadata->properties;
-	
-	while (props_list)
-	{
-		g_print ("Prop ");
-		props_list = g_list_next (props_list);
-	}
-	GList *elements;
-  
-  elements = gst_bin_get_list (GST_BIN (gp->_priv->decoder));
-
-  while (elements) {
-    GstElement *element = GST_ELEMENT (elements->data);
-
-    g_print ("element in bin: %s\n", GST_OBJECT_NAME (GST_OBJECT (element)));
-
-    elements = g_list_next (elements);
-  }*/
+	gapmd = g_new0 (GAPMetaData, 1);
+	gap_metadata_load (gapmd, gp->_priv->vfsuri);
 }
 
 static void eos_signal_cb (GstElement *gstelement, GAPPlayer *gp)

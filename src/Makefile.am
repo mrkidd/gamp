@@ -7,13 +7,15 @@ INCLUDES = \
 bin_PROGRAMS = gamp
 
 gamp_SOURCES = \
-	main.c\
-	gui-callbacks.c\
-	GAPPlayer.c\
-	GAPPlayer.h\
-	main.h\
-	playlist.c\
-	playlist.h
+	main.c \
+	gui-callbacks.c \
+	GAPPlayer.c \
+	GAPPlayer.h \
+	main.h \
+	playlist.c \
+	playlist.h \
+	gap-metadata.c \
+	gap-metadata.h
 
 gamp_LDFLAGS = 
 
