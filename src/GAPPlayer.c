@@ -29,7 +29,7 @@ static void gap_player_class_init (GAPPlayerClass *klass);
 static void gap_player_init (GAPPlayer *gp);
 static void gap_player_finalize (GObject *object);
 
-void gap_player_construct (GAPPlayer *gp);
+void gap_player_construct (GAPPlayer *gp, gboolean iradio);
 static gboolean gap_idle_handler (gpointer data);
 
 static void eos_signal_cb (GstElement *gstelement, GAPPlayer *gp);
@@ -128,7 +128,7 @@ static gboolean gap_idle_handler (gpointer data)
 	return gst_bin_iterate (GST_BIN (gst_pipeline));
 }
 
-void gap_player_construct (GAPPlayer *gp)
+void gap_player_construct (GAPPlayer *gp, gboolean iradio)
 {
 	g_return_if_fail (IS_GAP_PLAYER (gp));
 	
@@ -141,8 +141,12 @@ void gap_player_construct (GAPPlayer *gp)
 		g_object_unref (GST_OBJECT (gp->_priv->pipeline));
 		return;
 	}
-	
-	gp->_priv->decoder = gst_element_factory_make ("spider", "autoplugger");
+
+	g_printf ("Construct: iradio is %d\n", iradio);	
+	if (iradio)
+		gp->_priv->decoder = gst_element_factory_make ("mad", "autoplugger");
+	else
+		gp->_priv->decoder = gst_element_factory_make ("spider", "autoplugger");
 	if (gp->_priv->decoder == NULL)
 	{
 		error_dialog ("Could not load the Spider plugin, check your Gstreamer installation");
@@ -168,8 +172,13 @@ void gap_player_construct (GAPPlayer *gp)
 
 void gap_open (GAPPlayer *gp, char *vfsuri)
 {
+	gboolean iradio_mode = FALSE;
+	
 	g_return_if_fail (IS_GAP_PLAYER (gp));
 	
+	if (vfsuri && g_str_has_prefix (vfsuri, "http://"))
+		iradio_mode = TRUE;
+		
 	if (gp->_priv->pipeline)
 	{
 		gst_element_set_state (gp->_priv->pipeline, GST_STATE_NULL);
@@ -186,9 +195,10 @@ void gap_open (GAPPlayer *gp, char *vfsuri)
 		return;
 	}
 
-	g_printf ("gp vfsuri: %s\n", vfsuri);
-	gap_player_construct (gp);
+	g_printf ("gp vfsuri: %s, iradio: %d\n", vfsuri, iradio_mode);
+	gap_player_construct (gp, iradio_mode);
 
+	g_object_set (G_OBJECT (gp->_priv->filesrc), "iradio-mode", iradio_mode, NULL);
 	g_object_set (G_OBJECT (gp->_priv->filesrc), "location", vfsuri, NULL);
 	gp->_priv->vfsuri = g_strdup (vfsuri);
 }

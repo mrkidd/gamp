@@ -1,3 +1,8 @@
+2004-04-12  Mason Kidd  <mrkidd@mrkidd.com>
+
+	* src/gui-callbacks.c: Fix segfault with clearing playlist when opening file
+	* src/GAPPlayer.c: Attempt to support iRadio streams
+	
 2004-04-11  Mason Kidd  <mrkidd@mrkidd.com>
 
 	* src/gui-callbacks.c: Fix up behaviour of Open/Open Location/Add

@@ -55,13 +55,13 @@ void on_button_save_clicked (GtkButton *button, gpointer user_data);
 void on_button_clear_clicked (GtkButton *button, gpointer user_data);
 void on_button_close_clicked (GtkButton *button, gpointer user_data);
 
-gboolean cb_file_open (GtkDialog *dialog, int response_id);
+gboolean cb_file_open (GtkDialog *dialog, int response_id, gboolean clear);
 void cb_file_add (GtkWidget *widget, gpointer user_data);
 void cb_playlist_load (GtkWidget *widget, gpointer user_data);
 
-gboolean gap_add_files (char *title, GtkWindow *parent);
+gboolean gap_add_files (char *title, GtkWindow *parent, gboolean clear_playlist);
 
-gboolean gap_add_files (char *title, GtkWindow *parent)
+gboolean gap_add_files (char *title, GtkWindow *parent, gboolean clear_playlist)
 {
 	GtkWidget *file_selector;
 	int response;
@@ -82,14 +82,13 @@ gboolean gap_add_files (char *title, GtkWindow *parent)
 	gtk_widget_show_all (file_selector); */
 	response = gtk_dialog_run (GTK_DIALOG (file_selector));
 
-	return cb_file_open (GTK_DIALOG (file_selector), response);
+	return cb_file_open (GTK_DIALOG (file_selector), response, clear_playlist);
 }
 
 void on_open1_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
-	if (gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window)))
+	if (gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window), TRUE))
 	{
-		playlist_clear ();
 		playlist_play_and_sel_first ();
 	}
 }
@@ -292,7 +291,7 @@ void on_button_add_clicked (GtkButton *button, gpointer user_data)
 {
 	gboolean files_added;
 	
-	files_added = gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window));
+	files_added = gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window), FALSE);
 }
 
 void on_button_remove_clicked (GtkButton *button, gpointer user_data)
@@ -304,7 +303,7 @@ void on_button_open_clicked (GtkButton *button, gpointer user_data)
 {
 	gboolean files_added;
 	
-	files_added = gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window));
+	files_added = gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window), TRUE);
 }
 
 void on_button_save_clicked (GtkButton *button, gpointer user_data)
@@ -325,7 +324,7 @@ void on_button_close_clicked (GtkButton *button, gpointer user_data)
 }
 
 gboolean
-cb_file_open (GtkDialog *dialog, int response_id)
+cb_file_open (GtkDialog *dialog, int response_id, gboolean clear)
 {
 	char *mimetype;
 	GSList *uri_list = NULL, *uris = NULL;
@@ -344,6 +343,9 @@ cb_file_open (GtkDialog *dialog, int response_id)
 		/* Nothing was returned? */
 		return FALSE;
 	}	
+
+	if (clear)
+		playlist_clear ();
 	
 	for (uris = uri_list; uris; uris = uris->next)
 	{
