@@ -9,9 +9,6 @@ desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 gladedir = $(pkgdatadir)
 glade_DATA = gamp.glade open-location.glade
  
-icondir = $(datadir)/pixmaps
-icon_DATA = gamp.png
-
 EXTRA_DIST = \
 	AUTHORS					\
 	MAINTAINERS				\
@@ -23,8 +20,7 @@ EXTRA_DIST = \
 	omf.make				\
 	xmldocs.make			\
 	$(desktop_in_files)		\
-	$(glade_DATA)			\
-	$(icon_DATA)
+	$(glade_DATA)
 	
 DISTCLEANFILES = \
 	po/.intltool-merge-cache	\
