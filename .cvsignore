@@ -24,4 +24,4 @@ mkinstalldirs
 missing
 install-sh
 gamp.pws
-
+autom4te.cache/
