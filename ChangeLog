@@ -1,5 +1,9 @@
 2004-04-11  Mason Kidd  <mrkidd@mrkidd.com>
 
+	* src/gui-callbacks.c: Fix up behaviour of Open/Open Location/Add
+	
+2004-04-11  Mason Kidd  <mrkidd@mrkidd.com>
+
 	* src/main.c, src/GAPPlayer.c: Add an error dialog function, use it when setting up Gstreamer
 	
 2004-04-05  Mason Kidd  <mrkidd@mrkidd.com>

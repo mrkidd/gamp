@@ -55,15 +55,16 @@ void on_button_save_clicked (GtkButton *button, gpointer user_data);
 void on_button_clear_clicked (GtkButton *button, gpointer user_data);
 void on_button_close_clicked (GtkButton *button, gpointer user_data);
 
-void cb_file_open (GtkDialog *dialog, int response_id, GtkWidget parent);
+gboolean cb_file_open (GtkDialog *dialog, int response_id);
 void cb_file_add (GtkWidget *widget, gpointer user_data);
 void cb_playlist_load (GtkWidget *widget, gpointer user_data);
 
-void gap_add_files (char *title, GtkWindow *parent);
+gboolean gap_add_files (char *title, GtkWindow *parent);
 
-void gap_add_files (char *title, GtkWindow *parent)
+gboolean gap_add_files (char *title, GtkWindow *parent)
 {
 	GtkWidget *file_selector;
+	int response;
 	
 	file_selector = gtk_file_chooser_dialog_new (title, parent,
 						GTK_FILE_CHOOSER_ACTION_OPEN,
@@ -76,21 +77,28 @@ void gap_add_files (char *title, GtkWindow *parent)
 	gtk_window_set_modal (GTK_WINDOW (file_selector), FALSE);
 	gtk_window_set_destroy_with_parent (GTK_WINDOW (file_selector), TRUE);
 
-	g_signal_connect (G_OBJECT (file_selector), "response", G_CALLBACK (cb_file_open), 
+/*	g_signal_connect (G_OBJECT (file_selector), "response", G_CALLBACK (cb_file_open), 
 			parent);
-	gtk_widget_show_all (file_selector);
+	gtk_widget_show_all (file_selector); */
+	response = gtk_dialog_run (GTK_DIALOG (file_selector));
+
+	return cb_file_open (GTK_DIALOG (file_selector), response);
 }
 
 void on_open1_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
-	gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window));
+	if (gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window)))
+	{
+		playlist_clear ();
+		playlist_play_and_sel_first ();
+	}
 }
 
 void on_open_location1_activate (GtkButton *button, gpointer user_data)
 {
 	GtkWidget *dialog, *entry;
 	GladeXML *dialog_xml;
-	char *uri_entry;
+	const gchar *uri_entry;
 	int response;
 	GnomeVFSURI *vfsuri;
 
@@ -100,6 +108,7 @@ void on_open_location1_activate (GtkButton *button, gpointer user_data)
 	g_return_if_fail (dialog != NULL);
 	entry = glade_xml_get_widget (dialog_xml, "entry_location");
 	g_return_if_fail (entry != NULL);
+	gtk_dialog_set_default_response (GTK_DIALOG (dialog), GTK_RESPONSE_OK);
 
 	response = gtk_dialog_run (GTK_DIALOG (dialog));
 	if (response == GTK_RESPONSE_OK)
@@ -108,14 +117,37 @@ void on_open_location1_activate (GtkButton *button, gpointer user_data)
 		if ((uri_entry != NULL) && (strcmp (uri_entry, "") != 0))
 		{
 			vfsuri = gnome_vfs_uri_new (uri_entry);
-			if (vfsuri != NULL)
+			g_printf ("uri_entry: %s\n", uri_entry);
+			if ((vfsuri != NULL) && (gnome_vfs_uri_exists (vfsuri)))
 			{
-				gap_open (gamp_gp, uri_entry);
-				gap_play (gamp_gp);
-				update_currently_playing (uri_entry, TRUE);
-				playlist_add_item (uri_entry, "0:00", uri_entry);
-				gnome_vfs_uri_unref (vfsuri);
+				playlist_clear ();
+
+				if (gnome_vfs_uri_is_local (vfsuri))
+				{
+					char *filepath;
+					char *t_artist = NULL, *t_title = NULL, *t_format = NULL;
+					long t_duration;
+					char *s_duration;
+
+					filepath = gnome_vfs_get_local_path_from_uri (uri_entry);
+					gap_get_metadata_uri (filepath, &t_artist, &t_title, &t_duration);
+					t_format = g_strdup_printf ("%s - %s", t_artist, t_title);
+					s_duration = g_strdup_printf ("%d:%02d", t_duration / 60, t_duration % 60);
+
+					playlist_add_item (t_format, s_duration, filepath);
+					g_free (t_format);
+					g_free (t_artist);
+					g_free (t_title);
+					
+				}
+				else
+					playlist_add_item (uri_entry, "0:00", uri_entry);
+				
+				playlist_play_and_sel_first ();
 			}
+			else
+				error_dialog ("That location does not exist");
+			gnome_vfs_uri_unref (vfsuri);
 		}
 	}
 	gtk_widget_destroy (dialog);
@@ -258,7 +290,9 @@ void on_treeview_playlist_row_activated (GtkTreeView *treeview, GtkTreePath *arg
 
 void on_button_add_clicked (GtkButton *button, gpointer user_data)
 {
-	gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window));
+	gboolean files_added;
+	
+	files_added = gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window));
 }
 
 void on_button_remove_clicked (GtkButton *button, gpointer user_data)
@@ -268,7 +302,9 @@ void on_button_remove_clicked (GtkButton *button, gpointer user_data)
 
 void on_button_open_clicked (GtkButton *button, gpointer user_data)
 {
-	gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window));
+	gboolean files_added;
+	
+	files_added = gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window));
 }
 
 void on_button_save_clicked (GtkButton *button, gpointer user_data)
@@ -288,23 +324,25 @@ void on_button_close_clicked (GtkButton *button, gpointer user_data)
 	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (tbutton), FALSE);
 }
 
-void cb_file_open (GtkDialog *dialog, int response_id, GtkWidget parent)
+gboolean
+cb_file_open (GtkDialog *dialog, int response_id)
 {
 	char *mimetype;
 	GSList *uri_list = NULL, *uris = NULL;
 	char *selected_uri;
+	gboolean file_added = FALSE;
 
 	if (response_id != GTK_RESPONSE_OK)
 	{
 		gtk_widget_destroy (GTK_WIDGET (dialog));
-		return;
+		return FALSE;
 	}
 
 	uri_list = gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
 	if (uri_list == NULL)
 	{
 		/* Nothing was returned? */
-		return;
+		return FALSE;
 	}	
 	
 	for (uris = uri_list; uris; uris = uris->next)
@@ -318,22 +356,23 @@ void cb_file_open (GtkDialog *dialog, int response_id, GtkWidget parent)
 			long t_duration;
 			char *s_duration;
 		
-			gap_open (gamp_gp, uris->data);
-			gap_get_metadata (gamp_gp, &t_artist, &t_title, &t_duration);
+			gap_get_metadata_uri (uris->data, &t_artist, &t_title, &t_duration);
 			t_format = g_strdup_printf ("%s - %s", t_artist, t_title);
-			update_currently_playing (t_format, FALSE);
 			s_duration = g_strdup_printf ("%d:%02d", t_duration / 60, t_duration % 60);
+
 			playlist_add_item (t_format, s_duration, uris->data);
+			file_added = TRUE;
 			g_free (t_format);
 			g_free (t_artist);
 			g_free (t_title);
 		}
 	}
-	gap_play (gamp_gp);
 
-        g_slist_foreach (uri_list, (GFunc)g_free, NULL);
-        g_slist_free (uri_list);
-        gtk_widget_destroy (GTK_WIDGET (dialog));
+	g_slist_foreach (uri_list, (GFunc)g_free, NULL);
+	g_slist_free (uri_list);
+	gtk_widget_destroy (GTK_WIDGET (dialog));
+	
+	return file_added;
 }
 
 void cb_file_add (GtkWidget *widget, gpointer user_data)
@@ -381,6 +420,7 @@ void update_currently_playing (char *title, gboolean get_info)
 		currently_playing = g_strdup_printf ("<b><big>%s</big></b>", title);		
 
 	g_markup_escape_text (currently_playing, strlen (currently_playing));
+	gtk_label_set_line_wrap (GTK_LABEL (label_current_song), FALSE);
 	gtk_label_set_markup (GTK_LABEL (label_current_song), currently_playing);
 
 	g_free (currently_playing);	
