@@ -1,4 +1,4 @@
-SUBDIRS = src pixmaps data po
+SUBDIRS = src pixmaps data help po
 
 EXTRA_DIST = \
 	AUTHORS					\

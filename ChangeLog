@@ -1,3 +1,14 @@
+2004-07-21  Mason Kidd  <mrkidd@mrkidd.com>
+
+	* Makefile.am:
+	* configure.ac:
+	* data/Makefile.am:
+	* help/C/gamp-C.omf:
+	* help/C/gamp.xml:
+	* help/C/legal.xml:
+	* help/Makefile.am:
+		Add in template for documentation.
+
 2004-07-19  Mason Kidd  <mrkidd@mrkidd.com>
 
 	* data/gamp.desktop.in: Add MimeTypes line

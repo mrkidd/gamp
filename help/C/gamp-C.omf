@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<omf>
+  <resource>
+    <creator>
+      mrkidd@mrkidd.com
+    </creator>
+    <maintainer>
+      mrkidd@mrkidd.com
+    </maintainer>
+    <title>
+      Gnome Audio Player Manual
+    </title>
+    <date>
+      2004-07-21
+    </date>
+    <version identifier="0.4" date="2004-07-21" description="Initial creation, prorgam version 0.4"/>
+    <subject category="GNOME|Applications|Multimedia"/>
+    <description>
+      User manual for Gnome Audio Player.
+    </description>
+    <type>
+      user's guide
+    </type>
+    <format mime="text/xml" dtd="-//OASIS//DTD DocBook XML V4.1.2//EN"/>
+    <identifier url="gamp.xml"/>
+    <language code="C"/>
+    <rights type="GNU FDL" license.version="1.1" holder="Mason Kidd"/>
+  </resource>
+</omf>

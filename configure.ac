@@ -70,6 +70,8 @@ Makefile
 data/Makefile
 src/Makefile
 pixmaps/Makefile
+help/Makefile
+help/C/Makefile
 po/Makefile.in
 ])
 

@@ -9,8 +9,8 @@ icon_DATA = gamp.png
 applicationsdir = $(datadir)/application-registry
 applications_DATA = gamp.applications
 
-keys_DATA = gamp.keys
 keysdir = $(datadir)/mime-info
+keys_DATA = gamp.keys
 
 gladedir = $(pkgdatadir)
 glade_DATA = gamp.glade open-location.glade
