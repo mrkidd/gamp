@@ -1,3 +1,7 @@
+2004-07-10  Mason Kidd  <mrkidd@mrkidd.com>
+
+	*data/gamp.glade: Fix resizing the main window
+	
 2004-06-02  Mason Kidd  <mrkidd@mrkidd.com>
 
 	* data/gamp.glade: Make the main window resizable
