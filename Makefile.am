@@ -1,9 +1,6 @@
 SUBDIRS = src pixmaps po data
 
 
-gladedir = $(pkgdatadir)
-glade_DATA = gamp.glade open-location.glade
- 
 EXTRA_DIST = \
 	AUTHORS					\
 	MAINTAINERS				\
@@ -13,8 +10,7 @@ EXTRA_DIST = \
 	intltool-update.in		\
 	intltool-extract.in		\
 	omf.make				\
-	xmldocs.make			\
-	$(glade_DATA)
+	xmldocs.make
 	
 DISTCLEANFILES = \
 	po/.intltool-merge-cache	\
