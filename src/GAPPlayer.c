@@ -238,7 +238,7 @@ void gap_get_metadata (GAPPlayer *gp)
 
 	artist = g_strdup_printf ("Korn");
 	title = g_strdup_printf ("Blah");
-	g_print ("%s\n", gst_object_get_path_string (GST_OBJECT (gp->_priv->decoder)));*/
+	g_print ("%s\n", gst_object_get_path_string (GST_OBJECT (gp->_priv->decoder)));
 
 	GstCaps *caps_metadata;
 	GstProps *props_metadata;
@@ -255,7 +255,7 @@ void gap_get_metadata (GAPPlayer *gp)
 		g_print ("Prop ");
 		props_list = g_list_next (props_list);
 	}
-	/*GList *elements;
+	GList *elements;
   
   elements = gst_bin_get_list (GST_BIN (gp->_priv->decoder));
 
