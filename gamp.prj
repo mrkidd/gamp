@@ -53,7 +53,7 @@ project.config.disable.overwriting=0 0 0 0 0 0 0 0 0
 project.menu.entry=Audio Player
 project.menu.group=Multimedia
 project.menu.comment=gamp Audio Player
-project.menu.icon=gamp_icon.png
+project.menu.icon=gamp.png
 project.menu.need.terminal=0
 
 project.configure.options=
@@ -93,7 +93,7 @@ module.source.files=\
 module.pixmap.name=pixmaps
 module.pixmap.type=
 module.pixmap.files=\
-	gamp_icon.png\
+	gamp.png\
 	gamp-next.png\
 	gamp-pause.png\
 	gamp-play.png\
@@ -102,6 +102,7 @@ module.pixmap.files=\
 	gamp-shuffle.png\
 	gamp-stop.png\
 	gamp-volume.png\
+	gamp-eject.png\
 	gamp-playlist.png
 
 module.data.name=data

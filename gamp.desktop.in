@@ -3,7 +3,7 @@
 Name=Audio Player
 Comment=gamp Audio Player
 Exec=gamp
-Icon=@PACKAGE_PIXMAPS_DIR@/gamp_icon.png
+Icon=@PACKAGE_PIXMAPS_DIR@/gamp.png
 Terminal=false
 MultipleArgs=false
 Type=Application

@@ -3,7 +3,7 @@
 ## If you don't want it to overwrite it,
 ## 	Please disable it in the Anjuta project configuration
 
-SUBDIRS = intl po macros src pixmaps data
+SUBDIRS = intl po macros src data m4
 
 gampdocdir = ${prefix}/doc/gamp
 gampdoc_DATA = \
@@ -16,7 +16,7 @@ gampdoc_DATA = \
 	TODO\
 	ABOUT-NLS
 
-EXTRA_DIST = $(gampdoc_DATA)
+EXTRA_DIST = config.rpath  $(gampdoc_DATA)
 
 gnomemenudir = $(prefix)/@NO_PREFIX_PACKAGE_MENU_DIR@/Multimedia
 gnomemenu_DATA = gamp.desktop
@@ -29,3 +29,5 @@ dist-hook:
 		fi \
 	done
 
+
+#ACLOCAL_AMFLAGS = -I m4

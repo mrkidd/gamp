@@ -56,8 +56,10 @@ int main (int argc, char *argv[])
 	/*
 	 * The .glade filename should be on the next line.
 	 */
-	xml = glade_xml_new (PACKAGE_SOURCE_DIR"/gamp.glade", NULL, NULL);
-
+	xml = glade_xml_new (PACKAGE_SOURCE_DIR"/data/gamp.glade", NULL, NULL);
+	if (xml == NULL)
+		xml = glade_xml_new (PACKAGE_DATA_DIR"/gamp.glade", NULL, NULL);
+	
 	gamp_gp = gap_player_new();
 	
 	/* This is important */

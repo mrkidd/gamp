@@ -91,6 +91,8 @@ void on_open_location1_activate (GtkButton *button, gpointer user_data)
 	gtk_window_set_resizable (GTK_WINDOW (dialog_location), FALSE);
 
 	dialog_xml = glade_xml_new (PACKAGE_SOURCE_DIR"/data/open-location.glade", "dialog_open_location_content", NULL);
+	if (dialog_xml == NULL)
+		dialog_xml = glade_xml_new (PACKAGE_DATA_DIR"/open-location.glade", "dialog_open_location_content", NULL);
 	content = glade_xml_get_widget (dialog_xml, "dialog_open_location_content");
 	g_return_if_fail (content != NULL);
 
