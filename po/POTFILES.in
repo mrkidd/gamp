@@ -12,6 +12,5 @@ src/GAPPlayer.h
 src/main.h
 src/playlist.c
 src/playlist.h
-src/playlist-gui.c
 
 

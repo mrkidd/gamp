@@ -5,8 +5,7 @@
 ## 	Please disable it in the Anjuta project configuration
 
 INCLUDES = \
-	$(GNOME_CFLAGS)\
-	 -I/home/mrkidd/garnome/include
+	$(GNOME_CFLAGS)
 
 gamp_CFLAGS =\
 	 -Wall\
@@ -22,11 +21,9 @@ gamp_SOURCES = \
 	GAPPlayer.h\
 	main.h\
 	playlist.c\
-	playlist.h\
-	playlist-gui.c
+	playlist.h
 
-gamp_LDFLAGS = \
-	 -L/home/mrkidd/garnome/lib
+gamp_LDFLAGS = 
 
 gamp_LDADD =  \
 	$(GNOME_LIBS)
