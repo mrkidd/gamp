@@ -1,0 +1,10 @@
+
+[Desktop Entry]
+Name=Audio Player
+Comment=gamp Audio Player
+Exec=gamp
+Icon=@PACKAGE_PIXMAPS_DIR@/gamp_icon.png
+Terminal=false
+MultipleArgs=false
+Type=Application
+

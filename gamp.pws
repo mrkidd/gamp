@@ -1,0 +1,58 @@
+
+[filenumbers]
+0=145
+1=44
+2=43
+3=67
+4=20
+5=13
+6=52
+
+[filemarkers]
+0=
+1=
+2=
+3=
+4=
+5=
+6=
+
+[File View]
+filter.file.unmatch=*.so *.o *.a *.la
+filter.file.ignore.hidden=0
+filter.dir.ignore.hidden=0
+
+[executer]
+RunInTerminal=true
+
+[filelist]
+0=/home/mrkidd/Projects/gamp/src/GAPPlayer.c
+1=/home/mrkidd/Projects/gamp/src/playlist.c
+2=/home/mrkidd/Projects/gamp/src/gui-callbacks.c
+3=/home/mrkidd/Projects/gamp/src/main.c
+4=/home/mrkidd/Projects/gamp/src/main.h
+5=/home/mrkidd/Projects/gamp/src/playlist.h
+6=/home/mrkidd/Projects/gamp/src/GAPPlayer.h
+
+[Project Tree]
+0=0
+1=0:0
+2=0:1
+3=0:2
+
+[Symbol Tree]
+0=2
+1=5
+
+[File Tree]
+0=0
+
+[find_text]
+0=vfsuri:
+1=update_current
+2=playlist_add_item
+3=gp->_priv->vfsuri
+4=png
+
+[Project State]
+clean before build=false
