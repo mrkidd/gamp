@@ -25,3 +25,5 @@ missing
 install-sh
 gamp.pws
 autom4te.cache/
+.tm_project.cache
+
