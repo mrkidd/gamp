@@ -32,6 +32,13 @@
 #include "playlist.h"
 #include "GAPPlayer.h"
 
+
+struct poptOption options[] = {
+	{NULL, '\0', POPT_ARG_INCLUDE_TABLE, NULL, 0, "GStreamer", NULL},
+	POPT_TABLEEND
+};
+
+
 int main (int argc, char *argv[])
 {
 	GnomeProgram *p;
@@ -41,30 +48,29 @@ int main (int argc, char *argv[])
 	gint i;
 	
 	bindtextdomain (GETTEXT_PACKAGE, GNOMELOCALEDIR);
+	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
 	textdomain (PACKAGE);
 	
-	static const struct poptOption options[] = {
-		  {NULL, '\0', 0, NULL, 0, NULL, NULL}
-	};
+	options[0].arg = (void *) gst_init_get_popt_table ();
+	if (!(p = gnome_program_init (PACKAGE, VERSION, LIBGNOMEUI_MODULE,
+				argc, argv,
+				GNOME_PARAM_POPT_TABLE,	options,
+				GNOME_PARAM_HUMAN_READABLE_NAME, _("Gamp Audio Player"),
+				GNOME_PARAM_APP_DATADIR, DATADIR,
+				NULL)))
+		g_error ("gnome_program_init failed");
 
-	p = gnome_program_init (PACKAGE, VERSION, LIBGNOMEUI_MODULE,
-				argc, argv, GNOME_PARAM_POPT_TABLE,
-				options, NULL);
 	glade_gnome_init ();
-	gst_init (&argc, &argv);
 	gnome_vfs_init ();
-	/*
-	 * The .glade filename should be on the next line.
-	 */
+
 	xml = glade_xml_new (DATADIR "/gamp/gamp.glade", NULL, NULL);
 	
 	gamp_gp = gap_player_new();
 	
-	/* This is important */
 	glade_xml_signal_autoconnect (xml);
 	main_window = glade_xml_get_widget (xml, "window1");
 	playlist_window = glade_xml_get_widget (xml, "window_playlist");
-	gtk_widget_show (main_window);
+	gtk_widget_show_all (main_window);
 
 	playlist_treeview = GTK_TREE_VIEW (glade_xml_get_widget (xml, "treeview_playlist"));
 	playlist_create_list(playlist_treeview);
