@@ -113,7 +113,7 @@ void on_open_location1_activate (GtkButton *button, gpointer user_data)
 				gap_open (gamp_gp, uri_entry);
 				gap_play (gamp_gp);
 				update_currently_playing (uri_entry, TRUE);
-				playlist_add_item ("", "0:00", uri_entry);
+				playlist_add_item (uri_entry, "0:00", uri_entry);
 				gnome_vfs_uri_unref (vfsuri);
 			}
 		}

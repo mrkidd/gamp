@@ -242,6 +242,18 @@ void gap_get_metadata (GAPPlayer *gp, char **artist, char **title, long *duratio
 	g_free (gapmd);
 }
 
+void gap_get_metadata_uri (const char *uri, char **artist, char **title, long *duration)
+{
+	GAPMetaData *gapmd;
+	
+	gapmd = g_new0 (GAPMetaData, 1);
+	gap_metadata_load (gapmd, uri);
+	*artist = g_strdup (gapmd->artist);
+	*title = g_strdup (gapmd->title);
+	*duration = gapmd->duration;
+	g_free (gapmd);
+}
+
 static void eos_signal_cb (GstElement *gstelement, GAPPlayer *gp)
 {
 	g_idle_add ((GSourceFunc) eos_signal_idle, gp);

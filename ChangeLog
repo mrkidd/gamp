@@ -1,3 +1,9 @@
+2004-04-05  Mason Kidd  <mrkidd@mrkidd.com>
+
+	* src/playlist.c: Fix pls parsing.
+	* src/GAPPlayer.c, src/GAPPlayer.h: Added gap_get_metadata_uri function.
+	* src/main.c: Fix command line argument parsing
+	
 2004-03-31  Mason Kidd  <mrkidd@mrkidd.com>
 
 	* src/playlist.c: Fix column widths

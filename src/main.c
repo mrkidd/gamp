@@ -38,8 +38,87 @@ struct poptOption options[] = {
 	POPT_TABLEEND
 };
 
+char *uri_resolve_relative (const char *file);
+static gboolean has_valid_scheme (const char *uri);
+static gboolean is_valid_scheme_character (char c);
+static char *file_uri_from_local_relative_path (const char *location);
 
-int main (int argc, char *argv[])
+static char *
+file_uri_from_local_relative_path (const char *location)
+{
+	char *current_dir;
+	char *base_uri, *base_uri_slash;
+	char *location_escaped;
+	char *uri;
+	
+	current_dir = g_get_current_dir ();
+	base_uri = gnome_vfs_get_uri_from_local_path (current_dir);
+	base_uri_slash = g_strconcat (base_uri, "/", NULL);
+	
+	location_escaped = gnome_vfs_escape_path_string (location);
+	
+	uri = g_strconcat (base_uri_slash, location_escaped, NULL);
+	
+	g_free (location_escaped);
+	g_free (base_uri_slash);
+	g_free (base_uri);
+	g_free (current_dir);
+	
+	return uri;	
+}
+
+static gboolean
+is_valid_scheme_character (char c)
+{
+	return g_ascii_isalnum (c) || c == '+' || c == '-' || c == '.';
+}
+        
+static gboolean
+has_valid_scheme (const char *uri)
+{
+	const char *p;
+	
+	p = uri;
+	
+	if (!is_valid_scheme_character (*p))
+		return FALSE;
+		
+	do
+	{
+		p++;
+	} while (is_valid_scheme_character (*p));
+	
+	return *p == ':';
+}
+
+char *
+uri_resolve_relative (const char *file)
+{
+	char *uri;
+
+	g_return_val_if_fail (file != NULL, g_strdup (""));
+
+	switch (file[0])
+	{
+		case '\0':
+			uri = g_strdup ("");
+			break;
+		case '/':
+			uri = gnome_vfs_get_uri_from_local_path (file);
+			break;
+		default:
+			if (has_valid_scheme (file))
+				uri = g_strdup (file);
+			else
+				uri = file_uri_from_local_relative_path (file);
+			break;
+	}
+	
+	return uri;
+}
+
+int
+main (int argc, char *argv[])
 {
 	GnomeProgram *p;
 	poptContext context;
@@ -85,14 +164,30 @@ int main (int argc, char *argv[])
 		i = 0;
 		while (argvn[i] != NULL)
 		{
-			mime_type = gnome_vfs_get_mime_type (argvn[i]);
+			char *tmp;
+
+			tmp = uri_resolve_relative (argvn[i]);
+			mime_type = gnome_vfs_get_mime_type (tmp);
+			g_print ("mime_type: %s\n", mime_type);
 			if (g_ascii_strcasecmp (mime_type, "audio/x-scpls") == 0)
 				playlist_add_pls (argvn[i]);
 			else
-				playlist_add_item (argvn[i], "0:00", argvn[i]);
+			{
+				char *t_artist = NULL, *t_title = NULL, *t_format = NULL;
+				long t_duration;
+				char *s_duration;
+				
+				gap_get_metadata_uri (argvn[i], &t_artist, &t_title, &t_duration);
+				t_format = g_strdup_printf ("%s - %s", t_artist, t_title);
+				s_duration = g_strdup_printf ("%d:%02d", t_duration / 60, t_duration %60);
+				playlist_add_item (t_format, s_duration, argvn[i]);
+				g_free (t_format);
+				g_free (t_artist);
+				g_free (t_title);
+			}
 			i++;
 		}
-		//playlist_play_and_sel_first ();
+		playlist_play_and_sel_first ();
 	}
 	
 	gtk_main ();

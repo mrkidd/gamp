@@ -59,18 +59,6 @@ void playlist_add_item (char *title, char *time, char *uri)
 	GnomeVFSResult vfs_result;
 	
 	g_print ("Adding: %s\n", uri);
-/*	if (g_ascii_strcasecmp (title, "") == 0)
-	{
-		vfs_result = gnome_vfs_get_file_info (uri, &file_info, GNOME_VFS_FILE_INFO_DEFAULT);
-		if (vfs_result == GNOME_VFS_OK)
-		{
-			title = g_strdup (file_info.name);
-			gtk_list_store_append (liststore_playlist, &iter_add);
-			gtk_list_store_set (liststore_playlist, &iter_add, COLUMN_TITLE, title, COLUMN_TIME, time, COLUMN_URI, uri, -1);
-		}
-		else
-			g_print ("Unable to get info for: %s\n", uri);
-	}*/
 	gtk_list_store_append (liststore_playlist, &iter_add);
 	gtk_list_store_set (liststore_playlist, &iter_add,
 				COLUMN_TITLE, title,
@@ -105,11 +93,11 @@ void playlist_add_pls (char *uri)
 	if (number_of_entries <= 0)
 		return;
 
-	for (i = 2; i < (number_of_entries + 2); i++)
+	for (i = 2; i < (number_of_entries * 2); i++)
 	{
 		file_line = g_strsplit (file_lines[i], "=", 2);
 		if (g_ascii_strncasecmp (file_line[0], "file", 4) == 0)
-			playlist_add_item ("", "0:00", file_line[1]);
+			playlist_add_item (file_line[1], "0:00", file_line[1]);
 	}
 	
 	g_strfreev (file_lines);
@@ -138,11 +126,11 @@ void playlist_play_selected (void)
 	current_selection = gtk_tree_view_get_selection (playlist_treeview);
 	gtk_tree_selection_get_selected (current_selection, NULL, &iter);
 	
-	gtk_tree_model_get (tree_model, &iter, 2, &selected_uri, -1);
 	gtk_tree_model_get (tree_model, &iter, 0, &selected_title, -1);
+	gtk_tree_model_get (tree_model, &iter, 2, &selected_uri, -1);
 	
 	gap_open (gamp_gp, selected_uri);
-	update_currently_playing (selected_uri, FALSE);
+	update_currently_playing (selected_title, FALSE);
 	gap_play (gamp_gp);
 }
 
@@ -159,8 +147,8 @@ void playlist_play_and_sel_first (void)
 	gtk_tree_view_set_cursor (playlist_treeview, path, NULL, FALSE);
 	gtk_tree_model_get_iter_first (tree_model, &iter);
 	
-	gtk_tree_model_get (tree_model, &iter, 2, &selected_uri, -1);
 	gtk_tree_model_get (tree_model, &iter, 0, &selected_title, -1);
+	gtk_tree_model_get (tree_model, &iter, 2, &selected_uri, -1);
 	gap_open (gamp_gp, selected_uri);
 	update_currently_playing (selected_title, FALSE);
 	gap_play (gamp_gp);
