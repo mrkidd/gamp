@@ -10,3 +10,5 @@ MultipleArgs=True
 Type=Application
 Categories=GNOME;Application;AudioVideo;X-Ximian-Main;X-Red-Hat-Base;
 StartupNotify=True
+MimeTypes=application/x-ogg;application/ogg;audio/x-mp3;audio/x-scpls;audio/x-mpeg;audio/mepg;audio/x-mpegurl
+
