@@ -1,4 +1,4 @@
-# Anjuta Version 1.1.97 
+# Anjuta Version 1.1.98 
 Compatibility Level: 1 
 
 <PROJECT_DESCRIPTION_START>
@@ -31,7 +31,7 @@ LDFLAGS="$LDFLAGS $ADDLGNOME_LIBS"
 
 props.file.type=project
 
-anjuta.version=1.1.97
+anjuta.version=1.1.98
 anjuta.compatibility.level=1
 
 project.name=gamp
@@ -88,8 +88,7 @@ module.source.files=\
 	GAPPlayer.h\
 	main.h\
 	playlist.c\
-	playlist.h\
-	playlist-gui.c
+	playlist.h
 
 module.pixmap.name=pixmaps
 module.pixmap.type=
