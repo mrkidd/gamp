@@ -39,5 +39,6 @@ GtkTreeView *playlist_treeview;
 
 void update_currently_playing (char *uri, gboolean get_info);
 void cb_gap_player_eos (GAPPlayer *gp);
+void error_dialog (const char *error_text);
 
 #endif

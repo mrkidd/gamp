@@ -137,13 +137,29 @@ void gap_player_construct (GAPPlayer *gp)
 	gp->_priv->filesrc = gst_element_factory_make ("gnomevfssrc", "src");
 	if (gp->_priv->filesrc == NULL)
 	{
-		g_print ("Could not create GnomeVFSSrc object\n");
+		error_dialog ("Could not load the GnomeVFS plugin, check your Gstreamer installation");
 		g_object_unref (GST_OBJECT (gp->_priv->pipeline));
+		return;
 	}
 	
-	gp->_priv->decoder = gst_element_factory_make ("mad", "autoplugger");
+	gp->_priv->decoder = gst_element_factory_make ("spider", "autoplugger");
+	if (gp->_priv->decoder == NULL)
+	{
+		error_dialog ("Could not load the Spider plugin, check your Gstreamer installation");
+		gst_object_unref (GST_OBJECT (gp->_priv->filesrc));
+		g_object_unref (GST_OBJECT (gp->_priv->pipeline));
+		return;
+	}
 	
 	gp->_priv->audiosink = gst_gconf_get_default_audio_sink ();
+	if (gp->_priv->audiosink == NULL)
+	{
+		error_dialog ("Could not load the default output plugin, check your Gstreamer installation");
+		gst_object_unref (GST_OBJECT (gp->_priv->filesrc));
+		gst_object_unref (GST_OBJECT (gp->_priv->decoder));
+		g_object_unref (GST_OBJECT (gp->_priv->pipeline));
+		return;
+	}
 	
 	gst_bin_add_many (GST_BIN (gp->_priv->pipeline), gp->_priv->filesrc, gp->_priv->decoder, gp->_priv->audiosink, NULL);
 	gst_element_link_many (gp->_priv->filesrc, gp->_priv->decoder, gp->_priv->audiosink, NULL);

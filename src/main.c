@@ -46,7 +46,7 @@ static char *file_uri_from_local_relative_path (const char *location);
 static char *
 file_uri_from_local_relative_path (const char *location)
 {
-	char *current_dir;
+	const char *current_dir;
 	char *base_uri, *base_uri_slash;
 	char *location_escaped;
 	char *uri;
@@ -115,6 +115,20 @@ uri_resolve_relative (const char *file)
 	}
 	
 	return uri;
+}
+
+void error_dialog (const char *error_text)
+{
+	GtkWidget *dialog, *label;
+	gint response;
+	
+	dialog = gtk_dialog_new_with_buttons ("Gamp - Error", GTK_WINDOW (main_window),
+				GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+				GTK_STOCK_OK, GTK_RESPONSE_ACCEPT, NULL);
+	label = gtk_label_new (error_text);
+	gtk_container_add (GTK_CONTAINER (GTK_DIALOG (dialog)->vbox), label);
+	
+	response = gtk_dialog_run (GTK_DIALOG (dialog));
 }
 
 int

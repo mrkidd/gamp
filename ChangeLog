@@ -1,3 +1,7 @@
+2004-04-11  Mason Kidd  <mrkidd@mrkidd.com>
+
+	* src/main.c, src/GAPPlayer.c: Add an error dialog function, use it when setting up Gstreamer
+	
 2004-04-05  Mason Kidd  <mrkidd@mrkidd.com>
 
 	* conifgure.ac, NEWS: Version 0.3
