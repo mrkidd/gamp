@@ -1,6 +1,11 @@
+2004-07-10  Mason kidd  <mrkidd@mrkidd.com>
+
+	* data/gamp.keys: Add file for mime type support
+	* data/Makefile.am: Distribute keys file
+	
 2004-07-10  Mason Kidd  <mrkidd@mrkidd.com>
 
-	*data/gamp.glade: Fix resizing the main window
+	* data/gamp.glade: Fix resizing the main window
 	
 2004-06-02  Mason Kidd  <mrkidd@mrkidd.com>
 
