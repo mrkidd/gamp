@@ -2,7 +2,10 @@ INCLUDES = \
 	-DGNOMELOCALEDIR=\""$(prefix)/$(DATADIRNAME)/locale"\"	\
 	$(GNOME_CFLAGS)						\
 	$(GST_CFLAGS)						\
-	-DDATADIR=\""$(datadir)"\"
+	-DDATADIR=\""$(datadir)"\"			\
+	-DPREFIX=\""$(prefix)"\"			\
+	-DSYSCONFDIR=\""$(sysconfdir)"\"	\
+	-DLIBDIR=\""$(libdir)"\"
 
 bin_PROGRAMS = gamp
 

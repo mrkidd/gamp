@@ -152,7 +152,8 @@ main (int argc, char *argv[])
 				argc, argv,
 				GNOME_PARAM_POPT_TABLE,	options,
 				GNOME_PARAM_HUMAN_READABLE_NAME, _("Gamp Audio Player"),
-				GNOME_PARAM_APP_DATADIR, DATADIR,
+/*				GNOME_PARAM_APP_DATADIR, DATADIR, */
+				GNOME_PROGRAM_STANDARD_PROPERTIES,
 				NULL)))
 		g_error ("gnome_program_init failed");
 
