@@ -1,6 +1,3 @@
-icondir = $(datadir)/pixmaps
-icon_DATA = gamp.png
-
 gamp_pixmapsdir = $(pkgdatadir)/pixmaps
 gamp_pixmaps_DATA = \
 	gamp-eject.png \
@@ -12,10 +9,8 @@ gamp_pixmaps_DATA = \
 	gamp-shuffle.png \
 	gamp-stop.png \
 	gamp-volume.png \
-	gamp-playlist.png \
-	gamp.png
+	gamp-playlist.png
 
 EXTRA_DIST = \
-	$(gamp_pixmaps_DATA) \
-	$(icon_DATA)
+	$(gamp_pixmaps_DATA)
 

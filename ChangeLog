@@ -1,3 +1,9 @@
+2004-05-26  Mason Kidd  <mrkidd@mrkidd.com>
+
+	* Makefile.am, data/Makefile.am, data/gamp.glade, data/gamp.applications, data/gamp.png,
+	data/gamp.desktop.in: Move data files to the data/ directory, add an application-registry
+	file.
+	
 2004-05-15  Mason Kidd  <mrkidd@mrkidd.com>
 
 	* configure.ac: Bump version to 0.4
