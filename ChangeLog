@@ -1,3 +1,8 @@
+2004-03-31  Mason Kidd  <mrkidd@mrkidd.com>
+
+	* Makefile.am, pixmaps/Makefile.am, src/Makefile.am, others:  Cleanup the makefiles
+	from Anjuta
+
 2003-11-11  gettextize  <bug-gnu-gettext@gnu.org>
 
 	* Makefile.am (SUBDIRS): Remove intl.

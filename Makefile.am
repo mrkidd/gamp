@@ -1,33 +1,21 @@
-## Process this file with automake to produce Makefile.in
-## Created by Anjuta - will be overwritten
-## If you don't want it to overwrite it,
-## 	Please disable it in the Anjuta project configuration
+SUBDIRS = intl po macros src data m4 pixmaps
 
-SUBDIRS = intl po macros src data m4
+EXTRA_DIST = \
+	$(desktop_in_files)		\
+        gamp.glade              \
+        open-location.glade     \
+        gamp.png
 
-gampdocdir = ${prefix}/doc/gamp
-gampdoc_DATA = \
-	README\
-	COPYING\
-	AUTHORS\
-	ChangeLog\
-	INSTALL\
-	NEWS\
-	TODO\
-	ABOUT-NLS
-
-EXTRA_DIST = config.rpath  $(gampdoc_DATA)
-
-gnomemenudir = $(prefix)/@NO_PREFIX_PACKAGE_MENU_DIR@/Multimedia
-gnomemenu_DATA = gamp.desktop
-
-# Copy all the spec files. Of cource, only one is actually used.
-dist-hook:
-	for specfile in *.spec; do \
-		if test -f $$specfile; then \
-			cp -p $$specfile $(distdir); \
-		fi \
-	done
-
-
-#ACLOCAL_AMFLAGS = -I m4
+desktopdir = $(datadir)/applications
+desktop_in_files = gamp.desktop.in
+desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
+ 
+gladedir = $(pkgdatadir)
+glade_DATA = gamp.glade open-location.glade
+ 
+@INTLTOOL_DESKTOP_RULE@
+ 
+icondir = $(datadir)/pixmaps
+icon_DATA = gamp.png
+ 
+install-data-local:
