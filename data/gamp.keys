@@ -1,0 +1,29 @@
+application/x-ogg
+	short_list_application_ids_for_novice_user_level=gamp
+	short_list_application_ids_for_intermediate_user_level=gamp
+	short_list_application_ids_for_advanced_user_level=gamp
+application/ogg
+	short_list_application_ids_for_novice_user_level=gamp
+	short_list_application_ids_for_intermediate_user_level=gamp
+	short_list_application_ids_for_advanced_user_level=gamp
+audio/x-mp3
+	short_list_application_ids_for_novice_user_level=gamp
+	short_list_application_ids_for_intermediate_user_level=gamp
+	short_list_application_ids_for_advanced_user_level=gamp
+audio/x-scpls
+	short_list_application_ids_for_novice_user_level=gamp
+	short_list_application_ids_for_intermediate_user_level=gamp
+	short_list_application_ids_for_advanced_user_level=gamp
+audio/x-mpeg
+	short_list_application_ids_for_novice_user_level=gamp
+	short_list_application_ids_for_intermediate_user_level=gamp
+	short_list_application_ids_for_advanced_user_level=gamp
+audio/mpeg
+	short_list_application_ids_for_novice_user_level=gamp
+	short_list_application_ids_for_intermediate_user_level=gamp
+	short_list_application_ids_for_advanced_user_level=gamp
+audio/x-mpegurl
+	short_list_application_ids_for_novice_user_level=gamp
+	short_list_application_ids_for_intermediate_user_level=gamp
+	short_list_application_ids_for_advanced_user_level=gamp
+                                                
