@@ -2,10 +2,11 @@
 _Name=Gamp Audio Player
 _GenericName=Audio Player
 _Comment=Play your music files
-Exec=gamp
+Exec=gamp %F
+TryExec=gamp
 Icon=gamp.png
-Terminal=false
-MultipleArgs=false
+Terminal=False
+MultipleArgs=True
 Type=Application
 Categories=GNOME;Application;AudioVideo;X-Ximian-Main;X-Red-Hat-Base;
 StartupNotify=True

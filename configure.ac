@@ -67,6 +67,7 @@ AC_SUBST(POPT_LIBS)
 
 AC_OUTPUT([
 Makefile
+data/Makefile
 src/Makefile
 pixmaps/Makefile
 po/Makefile.in
