@@ -1,5 +1,9 @@
 2004-04-05  Mason Kidd  <mrkidd@mrkidd.com>
 
+	* conifgure.ac, NEWS: Version 0.3
+	
+2004-04-05  Mason Kidd  <mrkidd@mrkidd.com>
+
 	* src/playlist.c: Fix pls parsing.
 	* src/GAPPlayer.c, src/GAPPlayer.h: Added gap_get_metadata_uri function.
 	* src/main.c: Fix command line argument parsing

@@ -29,7 +29,7 @@ static void gap_player_class_init (GAPPlayerClass *klass);
 static void gap_player_init (GAPPlayer *gp);
 static void gap_player_finalize (GObject *object);
 
-static void gap_player_construct (GAPPlayer *gp);
+void gap_player_construct (GAPPlayer *gp);
 static gboolean gap_idle_handler (gpointer data);
 
 static void eos_signal_cb (GstElement *gstelement, GAPPlayer *gp);
@@ -118,8 +118,6 @@ GAPPlayer *gap_player_new (void)
 	
 	gp = GAP_PLAYER (g_object_new (GAP_PLAYER_TYPE, NULL));
 	
-	gap_player_construct (gp);
-	
 	return gp;
 }
 
@@ -130,20 +128,20 @@ static gboolean gap_idle_handler (gpointer data)
 	return gst_bin_iterate (GST_BIN (gst_pipeline));
 }
 
-static void gap_player_construct (GAPPlayer *gp)
+void gap_player_construct (GAPPlayer *gp)
 {
-	gp->_priv->playing = FALSE;
+	g_return_if_fail (IS_GAP_PLAYER (gp));
 	
 	gp->_priv->pipeline = gst_pipeline_new ("pipeline");
+
 	gp->_priv->filesrc = gst_element_factory_make ("gnomevfssrc", "src");
 	if (gp->_priv->filesrc == NULL)
 	{
 		g_print ("Could not create GnomeVFSSrc object\n");
 		g_object_unref (GST_OBJECT (gp->_priv->pipeline));
 	}
-	g_object_set (G_OBJECT (gp->_priv->filesrc), "location", NULL, NULL);
 	
-	gp->_priv->decoder = gst_element_factory_make ("spider", "autoplugger");
+	gp->_priv->decoder = gst_element_factory_make ("mad", "autoplugger");
 	
 	gp->_priv->audiosink = gst_gconf_get_default_audio_sink ();
 	
@@ -156,19 +154,27 @@ void gap_open (GAPPlayer *gp, char *vfsuri)
 {
 	g_return_if_fail (IS_GAP_PLAYER (gp));
 	
+	if (gp->_priv->pipeline)
+	{
+		gst_element_set_state (gp->_priv->pipeline, GST_STATE_NULL);
+		gst_object_unref (GST_OBJECT (gp->_priv->pipeline));
+		gp->_priv->pipeline = NULL;
+	}
+
 	g_free (gp->_priv->vfsuri);
 	gp->_priv->vfsuri = NULL;
+
 	if (vfsuri == NULL)
 	{
-		g_object_set (G_OBJECT (gp->_priv->filesrc), "location", NULL, NULL);
 		gp->_priv->playing = FALSE;
 		return;
 	}
 
-	gst_element_set_state (gp->_priv->pipeline, GST_STATE_READY);
-	gp->_priv->vfsuri = g_strdup (vfsuri);
-	g_object_ref (G_OBJECT (gp->_priv->filesrc));
+	g_printf ("gp vfsuri: %s\n", vfsuri);
+	gap_player_construct (gp);
+
 	g_object_set (G_OBJECT (gp->_priv->filesrc), "location", vfsuri, NULL);
+	gp->_priv->vfsuri = g_strdup (vfsuri);
 }
 
 void gap_play (GAPPlayer *gp)
@@ -187,9 +193,12 @@ void gap_pause (GAPPlayer *gp)
 
 void gap_stop (GAPPlayer *gp)
 {
+	g_return_if_fail (IS_GAP_PLAYER (gp));
+	
+	gp->_priv->playing = FALSE;
+	
 	gst_element_set_state (gp->_priv->pipeline, GST_STATE_READY);
 	g_idle_remove_by_data (gp->_priv->pipeline);
-	gp->_priv->playing = FALSE;
 }
 
 void gap_close (GAPPlayer *gp)
@@ -197,6 +206,16 @@ void gap_close (GAPPlayer *gp)
 	g_return_if_fail (IS_GAP_PLAYER (gp));
 
 	gap_stop (gp);
+
+	g_free (gp->_priv->vfsuri);
+	gp->_priv->vfsuri = NULL;
+
+	if (gp->_priv->pipeline == NULL)
+		return;
+		
+	gst_element_set_state (gp->_priv->pipeline, GST_STATE_NULL);
+	gst_object_unref (GST_OBJECT (gp->_priv->pipeline));
+	gp->_priv->pipeline = NULL;
 	
 	g_object_set (G_OBJECT (gp->_priv->filesrc), "location", NULL, NULL);
 	g_object_unref (G_OBJECT (gp->_priv->filesrc));

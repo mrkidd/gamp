@@ -1,16 +1,11 @@
 # List of source files containing translatable strings.
-
-## Created by Anjuta - will be overwritten
-## If you don't want it to overwrite it,
-## 	Please disable it in the Anjuta project configuration
-
-# Source files
+gamp.desktop.in
+gamp.glade
+open-location.glade
 src/main.c
+src/gap-metadata.c
 src/gui-callbacks.c
 src/GAPPlayer.c
-src/GAPPlayer.h
-src/main.h
 src/playlist.c
-src/playlist.h
 
 

@@ -1,0 +1,10 @@
+Overview of Changes in Gamp 0.3
+===============================
+* Retrieve file metadata via GStreamer
+* Display actual metadata in playlist and UI
+* Better .pls file parsing
+* Column widths in playlist are better sized
+* Display song duration in playlist
+* Use GtkFileChooser
+* Cleaned up dist file
+ 

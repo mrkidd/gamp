@@ -1,16 +1,9 @@
 AC_PREREQ([2.53])
  
 AC_INIT([gamp], [0.3])
-AC_CONFIG_SRCDIR(config.h.in)
- 
+AC_CONFIG_SRCDIR(src/main.c)
 AM_INIT_AUTOMAKE(AC_PACKAGE_NAME, AC_PACKAGE_VERSION)
 AM_CONFIG_HEADER(config.h)
-
-AC_SUBST(ACLOCAL_AMFLAGS, "$ACLOCAL_FLAGS")
- 
-AM_MAINTAINER_MODE
-
-AC_PROG_INTLTOOL
 
 dnl ** Requirements **
 GNOME_VFS_REQUIRED=2.5.91
@@ -19,12 +12,6 @@ LIBGLADE_REQUIRED=2.3.6
 GCONF_REQUIRED=2.5.90
 GTK_REQUIRED=2.4.0
 
-AC_PROG_CC
-AC_ISC_POSIX
-AC_STDC_HEADERS
-
-ACLOCAL="$ACLOCAL -I macros"
-
 dnl ** Translations **
 ALL_LINGUAS=""
 GETTEXT_PACKAGE=gamp
@@ -32,10 +19,8 @@ AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Define to the Gettext package name])
                                                                                                     
 AM_GLIB_GNU_GETTEXT
+AC_PROG_INTLTOOL
 
-
-GNOME_COMPILE_WARNINGS(yes)
-                                                                                                    
 AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
