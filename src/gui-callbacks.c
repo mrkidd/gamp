@@ -49,30 +49,40 @@ void on_togglebutton_playlist_toggled (GtkToggleButton *togglebutton, gpointer u
 void on_treeview_playlist_row_activated (GtkTreeView *treeview, GtkTreePath *arg1, GtkTreeViewColumn *arg2, gpointer user_data);
 void on_button_add_clicked (GtkButton *button, gpointer user_data);
 void on_button_remove_clicked (GtkButton *button, gpointer user_data);
-void on_button_load_clicked (GtkButton *button, gpointer user_data);
+void on_button_open_clicked (GtkButton *button, gpointer user_data);
 void on_button_save_clicked (GtkButton *button, gpointer user_data);
 void on_button_clear_clicked (GtkButton *button, gpointer user_data);
+void on_button_close_clicked (GtkButton *button, gpointer user_data);
 
-void on_button_open_clicked (GtkButton *button, gpointer user_data);
-void on_button_cancel_clicked (GtkButton *button, gpointer user_data);
-
-void cb_file_open (GtkWidget *widget, gpointer user_data);
+void cb_file_open (GtkDialog *dialog, int response_id, GtkWidget parent);
 void cb_file_add (GtkWidget *widget, gpointer user_data);
 void cb_playlist_load (GtkWidget *widget, gpointer user_data);
 
-void on_open1_activate (GtkMenuItem *menuitem, gpointer user_data)
+void gap_add_files (char *title, GtkWindow *parent);
+
+void gap_add_files (char *title, GtkWindow *parent)
 {
 	GtkWidget *file_selector;
 	
-	file_selector = gtk_file_selection_new ("Please select an Audio file");
-	g_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION (file_selector)->ok_button), 
-		"clicked", G_CALLBACK (cb_file_open), (gpointer) file_selector);
-	g_signal_connect_swapped (GTK_OBJECT (GTK_FILE_SELECTION (file_selector)->ok_button),
-		"clicked", G_CALLBACK (gtk_widget_destroy), (gpointer) file_selector);
-	g_signal_connect_swapped (GTK_OBJECT (GTK_FILE_SELECTION (file_selector)->cancel_button),
-		"clicked", G_CALLBACK (gtk_widget_destroy), (gpointer) file_selector);
-	
-	gtk_widget_show (file_selector);
+	file_selector = gtk_file_chooser_dialog_new (title, parent,
+						GTK_FILE_CHOOSER_ACTION_OPEN,
+						GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+						GTK_STOCK_OPEN, GTK_RESPONSE_OK,
+						NULL);
+	gtk_file_chooser_set_select_multiple (GTK_FILE_CHOOSER (file_selector), TRUE);
+	gtk_dialog_set_default_response (GTK_DIALOG (file_selector), GTK_RESPONSE_OK);
+	gtk_window_set_transient_for (GTK_WINDOW (file_selector), GTK_WINDOW (main_window));
+	gtk_window_set_modal (GTK_WINDOW (file_selector), FALSE);
+	gtk_window_set_destroy_with_parent (GTK_WINDOW (file_selector), TRUE);
+
+	g_signal_connect (G_OBJECT (file_selector), "response", G_CALLBACK (cb_file_open), 
+			parent);
+	gtk_widget_show_all (file_selector);
+}
+
+void on_open1_activate (GtkMenuItem *menuitem, gpointer user_data)
+{
+	gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window));
 }
 
 void on_open_location1_activate (GtkButton *button, gpointer user_data)
@@ -90,8 +100,8 @@ void on_open_location1_activate (GtkButton *button, gpointer user_data)
 	gtk_dialog_set_default_response (GTK_DIALOG (dialog_location), GTK_RESPONSE_OK);
 	gtk_window_set_resizable (GTK_WINDOW (dialog_location), FALSE);
 
-	dialog_xml = glade_xml_new (DATADIR "/data/open-location.glade", 
-			"dialog_open_location_content", NULL);
+	dialog_xml = glade_xml_new (DATADIR "/gamp/open-location.glade",
+					"dialog_open_location_content", NULL);
 	content = glade_xml_get_widget (dialog_xml, "dialog_open_location_content");
 	g_return_if_fail (content != NULL);
 
@@ -223,17 +233,7 @@ void on_treeview_playlist_row_activated (GtkTreeView *treeview, GtkTreePath *arg
 
 void on_button_add_clicked (GtkButton *button, gpointer user_data)
 {
-	GtkWidget *file_selector;
-	
-	file_selector = gtk_file_selection_new ("Please select an Audio file");
-	g_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION (file_selector)->ok_button), 
-		"clicked", G_CALLBACK (cb_file_add), (gpointer) file_selector);
-	g_signal_connect_swapped (GTK_OBJECT (GTK_FILE_SELECTION (file_selector)->ok_button),
-		"clicked", G_CALLBACK (gtk_widget_destroy), (gpointer) file_selector);
-	g_signal_connect_swapped (GTK_OBJECT (GTK_FILE_SELECTION (file_selector)->cancel_button),
-		"clicked", G_CALLBACK (gtk_widget_destroy), (gpointer) file_selector);
-	
-	gtk_widget_show (file_selector);
+	gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window));
 }
 
 void on_button_remove_clicked (GtkButton *button, gpointer user_data)
@@ -241,19 +241,9 @@ void on_button_remove_clicked (GtkButton *button, gpointer user_data)
 	playlist_remove_selected (playlist_treeview);
 }
 
-void on_button_load_clicked (GtkButton *button, gpointer user_data)
-{	
-	GtkWidget *file_selector;
-	
-	file_selector = gtk_file_selection_new ("Please select an Audio file");
-	g_signal_connect (GTK_OBJECT (GTK_FILE_SELECTION (file_selector)->ok_button), 
-		"clicked", G_CALLBACK (cb_playlist_load), (gpointer) file_selector);
-	g_signal_connect_swapped (GTK_OBJECT (GTK_FILE_SELECTION (file_selector)->ok_button),
-		"clicked", G_CALLBACK (gtk_widget_destroy), (gpointer) file_selector);
-	g_signal_connect_swapped (GTK_OBJECT (GTK_FILE_SELECTION (file_selector)->cancel_button),
-		"clicked", G_CALLBACK (gtk_widget_destroy), (gpointer) file_selector);
-	
-	gtk_widget_show (file_selector);
+void on_button_open_clicked (GtkButton *button, gpointer user_data)
+{
+	gap_add_files (_("Open Audio Files..."), GTK_WINDOW (main_window));
 }
 
 void on_button_save_clicked (GtkButton *button, gpointer user_data)
@@ -265,26 +255,51 @@ void on_button_clear_clicked (GtkButton *button, gpointer user_data)
 	playlist_clear ();
 }
 
-void cb_file_open (GtkWidget *widget, gpointer user_data)
+void on_button_close_clicked (GtkButton *button, gpointer user_data)
 {
-	GtkWidget *file_selector;
-	const char *mimetype;
-	char *selected_uri;
+	GtkWidget *tbutton;
 	
-	file_selector = (GtkWidget *) user_data;
-	selected_uri = gnome_vfs_get_uri_from_local_path (gtk_file_selection_get_filename (GTK_FILE_SELECTION (file_selector)));
-	mimetype = gnome_vfs_get_mime_type (selected_uri);
+	tbutton = glade_xml_get_widget (xml, "togglebutton_playlist");
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (tbutton), FALSE);
+}
 
-	if (g_ascii_strcasecmp (mimetype, "audio/x-scpls") == 0)
-		playlist_add_pls (selected_uri);
-	else
+void cb_file_open (GtkDialog *dialog, int response_id, GtkWidget parent)
+{
+	char *mimetype;
+	GSList *uri_list = NULL, *uris = NULL;
+	char *selected_uri;
+
+	if (response_id != GTK_RESPONSE_OK)
 	{
-		gap_open (gamp_gp, selected_uri);
-		gap_get_metadata (gamp_gp);
-		update_currently_playing (selected_uri, TRUE);
-		playlist_add_item ("", "0:00", selected_uri);
-		gap_play (gamp_gp);
+		gtk_widget_destroy (GTK_WIDGET (dialog));
+		return;
 	}
+
+	uri_list = gtk_file_chooser_get_uris (GTK_FILE_CHOOSER (dialog));
+	if (uri_list == NULL)
+	{
+		/* Nothing was returned? */
+		return;
+	}	
+	
+	for (uris = uri_list; uris; uris = uris->next)
+	{
+		mimetype = gnome_vfs_get_mime_type (uris->data);
+		if (g_ascii_strcasecmp (mimetype, "audio/x-scpls") == 0)
+			playlist_add_pls (uris->data);
+		else
+		{
+			gap_open (gamp_gp, uris->data);
+			gap_get_metadata (gamp_gp);
+			update_currently_playing (uris->data, TRUE);
+			playlist_add_item ("", "0:00", uris->data);
+		}
+	}
+	gap_play (gamp_gp);
+
+        g_slist_foreach (uri_list, (GFunc)g_free, NULL);
+        g_slist_free (uri_list);
+        gtk_widget_destroy (GTK_WIDGET (dialog));
 }
 
 void cb_file_add (GtkWidget *widget, gpointer user_data)

@@ -89,10 +89,5 @@ po/Makefile.in
 
 
 echo "
-Configuration:
-
-	Source code location:	${srcdir}
-	Compiler:		${CC}
-
 	GStreamer version:	$GST_MAJORMINOR
 "
