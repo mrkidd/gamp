@@ -24,6 +24,9 @@ mkinstalldirs
 missing
 install-sh
 autom4te.cache/
+autom4te*.cache
+autom4te.cache
+autom4te.cache/*
 .tm_project.cache
 gamp.desktop
 gamp.spec
