@@ -43,10 +43,12 @@ static gboolean has_valid_scheme (const char *uri);
 static gboolean is_valid_scheme_character (char c);
 static char *file_uri_from_local_relative_path (const char *location);
 
+static const GtkTargetEntry target_uri [] = {{ "text/uri-list", 0, 0 }};
+
 static char *
 file_uri_from_local_relative_path (const char *location)
 {
-	const char *current_dir;
+	char *current_dir;
 	char *base_uri, *base_uri_slash;
 	char *location_escaped;
 	char *uri;
@@ -139,6 +141,7 @@ main (int argc, char *argv[])
 	const gchar **argvn;
 	char *mime_type;
 	gint i;
+	int win_width, win_height;
 	
 	bindtextdomain (GETTEXT_PACKAGE, GNOMELOCALEDIR);
 	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
@@ -162,11 +165,14 @@ main (int argc, char *argv[])
 	
 	glade_xml_signal_autoconnect (xml);
 	main_window = glade_xml_get_widget (xml, "window1");
+	gtk_drag_dest_set (main_window, GTK_DEST_DEFAULT_ALL, target_uri, 1, GDK_ACTION_COPY);
 	playlist_window = glade_xml_get_widget (xml, "window_playlist");
+
 	gtk_widget_show_all (main_window);
 
 	playlist_treeview = GTK_TREE_VIEW (glade_xml_get_widget (xml, "treeview_playlist"));
 	playlist_create_list(playlist_treeview);
+	gtk_drag_dest_set (GTK_WIDGET (playlist_treeview), GTK_DEST_DEFAULT_ALL, target_uri, 1, GDK_ACTION_COPY);
 	
 	label_current_song = glade_xml_get_widget (xml, "label_current_song");
 	label_time = glade_xml_get_widget (xml, "label_time");

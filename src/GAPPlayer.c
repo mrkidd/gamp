@@ -145,7 +145,7 @@ gap_tick_timeout_cb (GAPPlayer *gp)
 	if (gp->_priv->playing == FALSE)
 		return TRUE;
 		
-	g_signal_emit (G_OBJECT (gp), gap_player_signals[TICK], 0);
+/*	g_signal_emit (G_OBJECT (gp), gap_player_signals[TICK], 0);*/
 	
 	return TRUE;
 }

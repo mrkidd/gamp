@@ -48,6 +48,8 @@ void on_togglebutton_equalizer_toggled (GtkToggleButton *togglebutton, gpointer 
 void on_togglebutton_playlist_toggled (GtkToggleButton *togglebutton, gpointer user_data);
 
 void on_treeview_playlist_row_activated (GtkTreeView *treeview, GtkTreePath *arg1, GtkTreeViewColumn *arg2, gpointer user_data);
+gboolean on_treeview_playlist_drag_drop (GtkWidget *wid, GdkDragContext *context, gint x, gint y, guint time, gpointer user_dat);
+void on_treeview_playlist_drag_data_received (GtkWidget *wid, GdkDragContext *context, gint x, gint y, GtkSelectionData *data, guint info, guint time, gpointer user_dat);
 void on_button_add_clicked (GtkButton *button, gpointer user_data);
 void on_button_remove_clicked (GtkButton *button, gpointer user_data);
 void on_button_open_clicked (GtkButton *button, gpointer user_data);
@@ -70,12 +72,17 @@ void cb_playlist_load (GtkWidget *widget, gpointer user_data);
 
 gboolean gap_add_files (char *title, GtkWindow *parent, gboolean clear_playlist);
 
+gboolean on_window1_drag_drop (GtkWidget *wid, GdkDragContext *context, gint x, gint y, guint time, gpointer user_data);
+void on_window1_drag_data_received (GtkWidget *wid, GdkDragContext *context, gint x, gint y, GtkSelectionData *data, guint info, guint time, gpointer user_data);
+
 gboolean slider_dragging = FALSE;
 gboolean slider_locked = FALSE;
 long latest_set_time = -1;
 long elapsed = 0;
 guint slider_moved_timeout = 0;
 guint value_changed_update_handler = 0;
+
+static const GtkTargetEntry target_uri [] = {{ "text/uri-list", 0, 0 }};
 
 gboolean gap_add_files (char *title, GtkWindow *parent, gboolean clear_playlist)
 {
@@ -301,6 +308,80 @@ void on_treeview_playlist_row_activated (GtkTreeView *treeview, GtkTreePath *arg
 	gap_play (gamp_gp);
 	
 	g_free (selected_uri);
+}
+
+gboolean
+on_treeview_playlist_drag_drop (GtkWidget *wid, GdkDragContext *context, gint x, gint y, guint time, gpointer user_dat)
+{
+	GdkAtom target;
+	
+	g_print ("DnD signal received\n");
+
+	target = gtk_drag_dest_find_target (wid, context, NULL);
+	if (target != GDK_NONE)
+	{
+/*		gtk_drag_get_data (main_window, context, target, time); */
+		
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+void
+on_treeview_playlist_drag_data_received (GtkWidget *wid, GdkDragContext *context, gint x, gint y, GtkSelectionData *data, guint info, guint time, gpointer user_dat)
+{
+	GList *list = NULL, *p = NULL;
+	GSList *file_list = NULL, *uris = NULL;
+	char *mimetype;
+	
+	g_print ("DnD data received\n");
+
+	if ((data->length >= 0) && (data->type == gdk_atom_intern ("text/uri-list", TRUE)))
+	{
+		list = gnome_vfs_uri_list_parse (data->data);
+		p = list;
+		while (p != NULL)
+		{
+			file_list = g_slist_prepend (file_list,
+										gnome_vfs_uri_to_string ((const GnomeVFSURI *)(p->data),
+										GNOME_VFS_URI_HIDE_NONE));
+			p = g_list_next (p);
+		}
+		gnome_vfs_uri_list_free (list);
+		file_list = g_slist_reverse (file_list);
+		
+		if (file_list == NULL)
+			return;
+			
+		for (uris = file_list; uris; uris = uris->next)
+		{
+			mimetype = gnome_vfs_get_mime_type (uris->data);
+			if (g_ascii_strcasecmp (mimetype, "audio/x-scpls") == 0)
+				playlist_add_pls (uris->data);
+			else
+			{
+				char *t_artist = NULL, *t_title = NULL, *t_format = NULL;
+				long t_duration;
+				char *s_duration;
+				
+				gap_get_metadata_uri (uris->data, &t_artist, &t_title, &t_duration);
+				t_format = g_strdup_printf ("%s - %s", t_artist, t_title);
+				s_duration = g_strdup_printf ("%d:%02d", t_duration / 60, t_duration % 60);
+				
+				playlist_add_item (t_format, s_duration, uris->data);
+				g_free (t_format);
+				g_free (t_artist);
+				g_free (t_title);
+			}
+		}
+
+		g_slist_foreach (file_list, (GFunc) g_free, NULL);
+		g_slist_free (file_list);
+		gtk_drag_finish (context, TRUE, FALSE, time);
+	}
+	
+	gtk_drag_finish (context, FALSE, FALSE, time);
 }
 
 void on_button_add_clicked (GtkButton *button, gpointer user_data)
@@ -551,3 +632,82 @@ slider_moved_cb (GtkAdjustment *adjust)
 {
 	return FALSE;
 }
+
+gboolean
+on_window1_drag_drop (GtkWidget *wid, GdkDragContext *context, gint x, gint y, guint time, gpointer user_data)
+{
+	GdkAtom target;
+	
+	g_print ("DnD signal received\n");
+
+	target = gtk_drag_dest_find_target (wid, context, NULL);
+	if (target != GDK_NONE)
+	{
+/*		gtk_drag_get_data (main_window, context, target, time); */
+		
+		return TRUE;
+	}
+	
+	return FALSE;
+}
+
+void
+on_window1_drag_data_received (GtkWidget *wid, GdkDragContext *context, gint x, gint y, GtkSelectionData *data, guint info, guint time, gpointer user_data)
+{
+	GList *list = NULL, *p = NULL;
+	GSList *file_list = NULL, *uris = NULL;
+	char *mimetype;
+	
+	g_print ("DnD data received\n");
+
+	if ((data->length >= 0) && (data->type == gdk_atom_intern ("text/uri-list", TRUE)))
+	{
+		list = gnome_vfs_uri_list_parse (data->data);
+		p = list;
+		while (p != NULL)
+		{
+			file_list = g_slist_prepend (file_list,
+										gnome_vfs_uri_to_string ((const GnomeVFSURI *)(p->data),
+										GNOME_VFS_URI_HIDE_NONE));
+			p = g_list_next (p);
+		}
+		gnome_vfs_uri_list_free (list);
+		file_list = g_slist_reverse (file_list);
+		
+		if (file_list == NULL)
+			return;
+			
+		playlist_clear ();
+
+		for (uris = file_list; uris; uris = uris->next)
+		{
+			mimetype = gnome_vfs_get_mime_type (uris->data);
+			if (g_ascii_strcasecmp (mimetype, "audio/x-scpls") == 0)
+				playlist_add_pls (uris->data);
+			else
+			{
+				char *t_artist = NULL, *t_title = NULL, *t_format = NULL;
+				long t_duration;
+				char *s_duration;
+				
+				gap_get_metadata_uri (uris->data, &t_artist, &t_title, &t_duration);
+				t_format = g_strdup_printf ("%s - %s", t_artist, t_title);
+				s_duration = g_strdup_printf ("%d:%02d", t_duration / 60, t_duration % 60);
+				
+				playlist_add_item (t_format, s_duration, uris->data);
+				g_free (t_format);
+				g_free (t_artist);
+				g_free (t_title);
+			}
+		}
+
+		playlist_play_and_sel_first ();
+		
+		g_slist_foreach (file_list, (GFunc) g_free, NULL);
+		g_slist_free (file_list);
+		gtk_drag_finish (context, TRUE, FALSE, time);
+	}
+	
+	gtk_drag_finish (context, FALSE, FALSE, time);
+}
+
