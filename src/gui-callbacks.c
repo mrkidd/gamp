@@ -55,6 +55,8 @@ void on_button_save_clicked (GtkButton *button, gpointer user_data);
 void on_button_clear_clicked (GtkButton *button, gpointer user_data);
 void on_button_close_clicked (GtkButton *button, gpointer user_data);
 
+void cb_gap_player_tick (GAPPlayer *gp);
+void sync_time (GtkAdjustment *adjust);
 gboolean on_hscale_progress_button_press_event (GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 gboolean on_hscale_progress_button_release_event (GtkWidget *widget, GdkEventButton *event, gpointer user_data);
 gboolean on_hscale_progress_motion_notify_event (GtkWidget *widget, GdkEventMotion *event, gpointer user_data);
@@ -422,6 +424,20 @@ void cb_playlist_load (GtkWidget *widget, gpointer user_data)
 		playlist_add_pls (selected_uri);
 }
 
+void update_time (int time)
+{
+	char *current_time;
+	int seconds = 0, minutes = 0;
+	
+	if (time > 0)
+	{
+		minutes = time / 60;
+		seconds = time % 60;
+	}
+	current_time = g_strdup_printf ("<span size=\"xx-large\"><b>%d:%02d</b></span>", minutes, seconds);
+	gtk_label_set_markup (GTK_LABEL (label_time), current_time);
+}
+
 void update_currently_playing (char *title, gboolean get_info)
 {
 	char *currently_playing;
@@ -447,13 +463,47 @@ void cb_gap_player_eos (GAPPlayer *gp)
 	playlist_next ();
 }
 
+void cb_gap_player_tick (GAPPlayer *gp)
+{
+	sync_time (gtk_range_get_adjustment (GTK_RANGE (glade_xml_get_widget (xml, "hscale_progress"))));
+}
+
+void
+sync_time (GtkAdjustment *adjust)
+{
+	int seconds;
+	long duration;
+	
+	if (slider_dragging == TRUE)
+		return;
+		
+	duration = gap_get_duration (gamp_gp);
+	seconds = gap_get_time (gamp_gp);
+	
+	if (duration > -1)
+	{
+		double progress = 0.0;
+		
+		if (seconds > 0)
+			progress = (double) ((long) seconds) / duration;
+			
+		slider_locked = TRUE;
+		gtk_adjustment_set_value (adjust, progress);
+		slider_locked = FALSE;
+	}
+	else
+	{
+		slider_locked = TRUE;
+		gtk_adjustment_set_value (adjust, 0.0);
+		slider_locked = FALSE;
+	}
+	update_time (seconds);
+}
+
 gboolean
 on_hscale_progress_button_press_event (GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
-	g_print ("Entered button press event\n");
-	
 	slider_dragging = TRUE;
-	latest_set_time = -1;
 	
 	return FALSE;
 }
@@ -461,36 +511,20 @@ on_hscale_progress_button_press_event (GtkWidget *widget, GdkEventButton *event,
 gboolean
 on_hscale_progress_button_release_event (GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
-	gdouble progress;
-	long duration, new;
-	GtkAdjustment *adjustment;
-
-	g_printf ("entered button release event, %d\n", slider_dragging);
+	GtkAdjustment *adjust;
+	long duration;
+	double progress, new;
 	
 	if (slider_dragging == FALSE)
-		return FALSE;
-
-	adjustment = gtk_range_get_adjustment (GTK_RANGE (widget));
+		return;
 	
-	progress = gtk_adjustment_get_value (adjustment);
-	g_printf ("progress: %lf\n", progress);
+	adjust = gtk_range_get_adjustment (GTK_RANGE (widget));
+	progress = gtk_adjustment_get_value (adjust);
 	duration = gap_get_duration (gamp_gp);
-	g_printf ("duration: %ld\n", duration);
 	new = (long) (progress * duration);
-	g_printf ("new: %ld\n", new);
-
-	if (new != latest_set_time)
-		gap_set_time (gamp_gp, new);
-		
+	gap_set_time (gamp_gp, new);
+	
 	slider_dragging = FALSE;
-
-	/* sync time */
-
-	if (slider_moved_timeout !=0)
-	{
-		g_source_remove (slider_moved_timeout);
-		slider_moved_timeout = 0;
-	}
 	
 	return FALSE;
 }
@@ -498,68 +532,22 @@ on_hscale_progress_button_release_event (GtkWidget *widget, GdkEventButton *even
 gboolean
 on_hscale_progress_motion_notify_event (GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
-	GtkAdjustment *adjustment;
-	double progress;
-	long duration;
-	
-	if (slider_dragging == FALSE)
-		return FALSE;
-		
-	adjustment = gtk_range_get_adjustment (GTK_RANGE (widget));
-	
-	progress = gtk_adjustment_get_value (adjustment);
-	duration = gap_get_duration (gamp_gp);
-	
-	elapsed = (long) (progress * duration);
-	
-	/* update elapsed */
-	
-	if (slider_moved_timeout != 0)
-	{
-		g_source_remove (slider_moved_timeout);
-		slider_moved_timeout = 0;
-	}
-	slider_moved_timeout = g_timeout_add (40, (GSourceFunc) slider_moved_cb, adjustment);
-	
 	return FALSE;
 }
 
 void
 on_hscale_progress_value_changed (GtkRange *range, gpointer user_data)
 {
-	g_print ("Entered value changed event\n");
-
-	if ((slider_dragging == FALSE) && (slider_locked == FALSE) && (value_changed_update_handler == 0))
-	{
-		slider_dragging = TRUE;
-		value_changed_update_handler = g_idle_add ((GSourceFunc) changed_idle_cb, range);
-	}
 }
 
 gboolean
 changed_idle_cb (GtkRange *range)
 {
-	on_hscale_progress_button_release_event (GTK_WIDGET (range), NULL, NULL);
-	
-	value_changed_update_handler = 0;
-	g_print ("in changed_idle_cb\n");
-	
 	return FALSE;
 }
 
 gboolean
 slider_moved_cb (GtkAdjustment *adjust)
 {
-	double progress;
-	long duration, new;
-	
-	progress = gtk_adjustment_get_value (adjust);
-	duration = gap_get_duration (gamp_gp);
-	new = (long) (progress * duration);
-	
-	gap_set_time (gamp_gp, new);
-	
-	latest_set_time = new;
-	
 	return FALSE;
 }

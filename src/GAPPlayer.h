@@ -55,6 +55,7 @@ typedef struct
 	GObjectClass parent_class;
 
 	void (*eos) (GAPPlayer *gp);
+	void (*tick) (GAPPlayer *gp);
 } GAPPlayerClass;
 
 GType gap_player_get_type (void);

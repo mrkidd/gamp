@@ -169,8 +169,10 @@ main (int argc, char *argv[])
 	playlist_create_list(playlist_treeview);
 	
 	label_current_song = glade_xml_get_widget (xml, "label_current_song");
+	label_time = glade_xml_get_widget (xml, "label_time");
 	g_signal_connect (G_OBJECT (gamp_gp), "eos", G_CALLBACK (cb_gap_player_eos), NULL);
-	
+	g_signal_connect (G_OBJECT (gamp_gp), "tick", G_CALLBACK (cb_gap_player_tick), NULL);
+		
 	g_object_get (p, "popt-context", &context, NULL);
 	argvn = poptGetArgs (context);
 	if (argvn)

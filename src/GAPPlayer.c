@@ -31,6 +31,7 @@ static void gap_player_finalize (GObject *object);
 
 void gap_player_construct (GAPPlayer *gp, gboolean iradio);
 static gboolean gap_idle_handler (gpointer data);
+static gboolean gap_tick_timeout_cb (GAPPlayer *gp);
 
 static void eos_signal_cb (GstElement *gstelement, GAPPlayer *gp);
 static gboolean eos_signal_idle (GAPPlayer *gp);
@@ -44,13 +45,18 @@ struct GAPPlayerPrivate
 	
 	char *vfsuri;
 	long duration;
-	
+
+	GTimer *timer;
+	guint tick_timeout;
+	long timer_add;
+		
 	gboolean playing;
 	gboolean mute;
 };
 
 typedef enum {
 	EOS,
+	TICK,
 	LAST_SIGNAL
 } GAPPlayerSignalType;
 
@@ -93,11 +99,17 @@ static void gap_player_class_init (GAPPlayerClass *klass)
 	
 	gap_player_signals[EOS] = g_signal_new ("eos", G_OBJECT_CLASS_TYPE (object_class), G_SIGNAL_RUN_LAST,
 		G_STRUCT_OFFSET (GAPPlayerClass, eos), NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
+	gap_player_signals[TICK] = g_signal_new ("tick", G_OBJECT_CLASS_TYPE (object_class), G_SIGNAL_RUN_LAST,
+		G_STRUCT_OFFSET (GAPPlayerClass, tick), NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 }
 
 static void gap_player_init (GAPPlayer *gp)
 {
+	gint ms_period = 1000 / 5;
+	
 	gp->_priv = g_new0 (GAPPlayerPrivate, 1);
+	
+	gp->_priv->tick_timeout = g_timeout_add (ms_period, (GSourceFunc) gap_tick_timeout_cb, gp);
 }
 
 static void gap_player_finalize (GObject *object)
@@ -105,9 +117,14 @@ static void gap_player_finalize (GObject *object)
 	GAPPlayer *gp;
 	
 	gp = GAP_PLAYER (object);
+
+	g_source_remove (gp->_priv->tick_timeout);
 	
 	gap_close (gp);
-	
+
+	if (gp->_priv->timer)
+		g_timer_destroy (gp->_priv->timer);
+			
 	g_free (gp->_priv);
 	
 	G_OBJECT_CLASS (parent_class)->finalize (object);
@@ -120,6 +137,17 @@ GAPPlayer *gap_player_new (void)
 	gp = GAP_PLAYER (g_object_new (GAP_PLAYER_TYPE, NULL));
 	
 	return gp;
+}
+
+static gboolean
+gap_tick_timeout_cb (GAPPlayer *gp)
+{
+	if (gp->_priv->playing == FALSE)
+		return TRUE;
+		
+	g_signal_emit (G_OBJECT (gp), gap_player_signals[TICK], 0);
+	
+	return TRUE;
 }
 
 static gboolean gap_idle_handler (gpointer data)
@@ -170,6 +198,13 @@ void gap_player_construct (GAPPlayer *gp, gboolean iradio)
 	gst_bin_add_many (GST_BIN (gp->_priv->pipeline), gp->_priv->filesrc, gp->_priv->decoder, gp->_priv->audiosink, NULL);
 	gst_element_link_many (gp->_priv->filesrc, gp->_priv->decoder, gp->_priv->audiosink, NULL);
 	gst_element_set_state (gp->_priv->pipeline, GST_STATE_READY);
+	
+	if (gp->_priv->timer)
+		g_timer_destroy (gp->_priv->timer);
+	gp->_priv->timer = g_timer_new ();
+	g_timer_stop (gp->_priv->timer);
+	g_timer_reset (gp->_priv->timer);
+	gp->_priv->timer_add = 0;
 }
 
 void gap_open (GAPPlayer *gp, char *vfsuri)
@@ -212,6 +247,8 @@ void gap_play (GAPPlayer *gp)
 	gst_element_set_state (gp->_priv->pipeline, GST_STATE_PLAYING);
 	gp->_priv->playing = TRUE;
 	
+	g_timer_start (gp->_priv->timer);
+	
 	g_idle_add ((GSourceFunc) gap_idle_handler, gp);
 	g_signal_connect (G_OBJECT (gp->_priv->audiosink), "eos", G_CALLBACK (eos_signal_cb), gp);
 }
@@ -219,6 +256,9 @@ void gap_play (GAPPlayer *gp)
 void gap_pause (GAPPlayer *gp)
 {
 	gst_element_set_state (gp->_priv->pipeline, GST_STATE_PAUSED);
+	gp->_priv->timer_add += floor (g_timer_elapsed (gp->_priv->timer, NULL) + 0.5);
+	g_timer_stop (gp->_priv->timer);
+	g_timer_reset (gp->_priv->timer);
 }
 
 void gap_stop (GAPPlayer *gp)
@@ -228,6 +268,9 @@ void gap_stop (GAPPlayer *gp)
 	gp->_priv->playing = FALSE;
 	
 	gst_element_set_state (gp->_priv->pipeline, GST_STATE_READY);
+	g_timer_stop (gp->_priv->timer);
+	g_timer_reset (gp->_priv->timer);
+	gp->_priv->timer_add = 0;
 	g_idle_remove_by_data (gp->_priv->pipeline);
 }
 
@@ -265,8 +308,7 @@ long gap_get_time (GAPPlayer *gp)
 
 	if (gp->_priv->pipeline != NULL)
 	{	
-		gst_clock = gst_bin_get_clock (GST_BIN (gp->_priv->pipeline));
-		time = (long) gst_clock_get_time (gst_clock);
+		time = (long) floor (g_timer_elapsed (gp->_priv->timer, NULL) + 0.5) + gp->_priv->timer_add;
 	}
 	else
 		time = -1;
@@ -290,6 +332,9 @@ void gap_set_time (GAPPlayer *gp, long time)
 	
 	if (gp->_priv->playing == TRUE)
 		gst_element_set_state (gp->_priv->pipeline, GST_STATE_PLAYING);
+		
+	g_timer_reset (gp->_priv->timer);
+	gp->_priv->timer_add = time;
 }
 
 void gap_get_metadata (GAPPlayer *gp, char **artist, char **title, long *duration)

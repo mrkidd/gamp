@@ -33,12 +33,15 @@
 GtkWidget *playlist_window;
 GtkWidget *main_window;
 GtkWidget *label_current_song;
+GtkWidget *label_time;
 GAPPlayer *gamp_gp;
 GladeXML *xml;
 GtkTreeView *playlist_treeview;
 
 void update_currently_playing (char *uri, gboolean get_info);
+void update_time (int time);
 void cb_gap_player_eos (GAPPlayer *gp);
+void cb_gap_player_tick (GAPPlayer *gp);
 void error_dialog (const char *error_text);
 
 #endif
