@@ -4,20 +4,17 @@
 srcdir=`dirname $0`
 test -z "$srcdir" && srcdir=.
 
-if test -z "$GNOME2_DIR" ; then
-  GNOME_COMMON_DATADIR="/usr/share"
-else
-  GNOME_COMMON_DATADIR="$GNOME2_DIR/share"
-fi
+PKG_NAME="gamp"
 
-GNOME_COMMON_MACROS_DIR="macros"
+(test -f $srcdir/configure.ac \
+  && test -f $srcdir/README) || {
+    echo -n "**Error**: Directory "\`$srcdir\'" does not look like the"
+    echo " top-level $PKG_NAME directory"
+    exit 1
+}
 
-export GNOME_COMMON_DATADIR
-export GNOME_COMMON_MACROS_DIR
-
-ACLOCAL_FLAGS="-I $GNOME_COMMON_MACROS_DIR $ACLOCAL_FLAGS"
-export ACLOCAL_FLAGS
-
-PKG_NAME="the package"
-
-. $srcdir/$GNOME_COMMON_MACROS_DIR/autogen.sh
+which gnome-autogen.sh || {
+    echo "You need to install gnome-common from the GNOME CVS"
+    exit 1
+}
+USE_GNOME2_MACROS=1 USE_COMMON_DOC_BUILD=yes . gnome-autogen.sh
