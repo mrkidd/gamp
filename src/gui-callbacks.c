@@ -88,52 +88,38 @@ void on_open1_activate (GtkMenuItem *menuitem, gpointer user_data)
 
 void on_open_location1_activate (GtkButton *button, gpointer user_data)
 {
-	GtkWidget *dialog_location, *entry_location, *content;
+	GtkWidget *dialog, *entry;
 	GladeXML *dialog_xml;
 	char *uri_entry;
+	int response;
 	GnomeVFSURI *vfsuri;
 
-	dialog_location = gtk_dialog_new_with_buttons ("Open Location",
-							 GTK_WINDOW (main_window), GTK_DIALOG_MODAL, GTK_STOCK_CANCEL,
-							 GTK_RESPONSE_CANCEL, GTK_STOCK_OPEN, GTK_RESPONSE_OK, NULL);
-	g_return_if_fail (dialog_location != NULL);
-
-	gtk_dialog_set_default_response (GTK_DIALOG (dialog_location), GTK_RESPONSE_OK);
-	gtk_window_set_resizable (GTK_WINDOW (dialog_location), FALSE);
-
 	dialog_xml = glade_xml_new (DATADIR "/gamp/open-location.glade",
-					"dialog_open_location_content", NULL);
-	content = glade_xml_get_widget (dialog_xml, "dialog_open_location_content");
-	g_return_if_fail (content != NULL);
+					"dialog_open_location", NULL);
+	dialog = glade_xml_get_widget (dialog_xml, "dialog_open_location");
+	g_return_if_fail (dialog != NULL);
+	entry = glade_xml_get_widget (dialog_xml, "entry_location");
+	g_return_if_fail (entry != NULL);
 
-	gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog_location)->vbox), content, FALSE, FALSE, 0);	
-	
-	entry_location = glade_xml_get_widget (dialog_xml, "entry_location");
-	g_return_if_fail (entry_location != NULL);
-
-	switch (gtk_dialog_run (GTK_DIALOG (dialog_location)))
+	response = gtk_dialog_run (GTK_DIALOG (dialog));
+	if (response == GTK_RESPONSE_OK)
 	{
-		case GTK_RESPONSE_OK:
+		uri_entry = gtk_entry_get_text (GTK_ENTRY (entry));
+		if ((uri_entry != NULL) && (strcmp (uri_entry, "") != 0))
 		{
-			uri_entry = gtk_editable_get_chars (GTK_EDITABLE (entry_location), 0, -1);
-			if (uri_entry != NULL)
+			vfsuri = gnome_vfs_uri_new (uri_entry);
+			if (vfsuri != NULL)
 			{
-				vfsuri = gnome_vfs_uri_new (uri_entry);
-				if (vfsuri != NULL)
-				{
-					gap_open (gamp_gp, uri_entry);
-					gap_play (gamp_gp);
-					update_currently_playing (uri_entry, TRUE);
-					playlist_add_item ("", "0:00", uri_entry);
-					gnome_vfs_uri_unref (vfsuri);
-				}
+				gap_open (gamp_gp, uri_entry);
+				gap_play (gamp_gp);
+				update_currently_playing (uri_entry, TRUE);
+				playlist_add_item ("", "0:00", uri_entry);
+				gnome_vfs_uri_unref (vfsuri);
 			}
-			break;
 		}
-		default:
-			break;
 	}
-	gtk_widget_destroy (dialog_location);
+	gtk_widget_destroy (dialog);
+	g_object_unref (dialog_xml);
 }
 
 void on_quit1_activate (GtkMenuItem *menuitem, gpointer user_data)

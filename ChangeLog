@@ -1,7 +1,12 @@
 2004-03-31  Mason Kidd  <mrkidd@mrkidd.com>
 
+	* open-location.glade, src/gui-callbacks.c: Use the full dialog from the glade file
+	instead of creating one.
+
+2004-03-31  Mason Kidd  <mrkidd@mrkidd.com>
+
 	* Makefile.am, pixmaps/Makefile.am, src/Makefile.am, others:  Cleanup the makefiles
-	from Anjuta
+	from Anjuta.
 
 2003-11-11  gettextize  <bug-gnu-gettext@gnu.org>
 
