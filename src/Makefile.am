@@ -1,5 +1,6 @@
 INCLUDES = \
-	$(GNOME_CFLAGS)
+	$(GNOME_CFLAGS)		\
+	$(GST_CFLAGS)
 
 bin_PROGRAMS = gamp
 
@@ -15,5 +16,6 @@ gamp_SOURCES = \
 gamp_LDFLAGS = 
 
 gamp_LDADD =  \
-	$(GNOME_LIBS)
+	$(GNOME_LIBS)		\
+	$(GST_LIBS)
 

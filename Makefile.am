@@ -1,4 +1,4 @@
-SUBDIRS = intl po macros src data m4 pixmaps
+SUBDIRS = src pixmaps po
 
 EXTRA_DIST = \
 	$(desktop_in_files)		\
