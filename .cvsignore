@@ -23,7 +23,8 @@ COPYING
 mkinstalldirs
 missing
 install-sh
-gamp.pws
 autom4te.cache/
 .tm_project.cache
-
+gamp.desktop
+gamp.spec
+gamp.schemas
