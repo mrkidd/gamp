@@ -1,5 +1,9 @@
 2004-03-31  Mason Kidd  <mrkidd@mrkidd.com>
 
+	* src/gui-callbacks.c, src/GAPPlayer.c: Use the metadata in the UI
+
+2004-03-31  Mason Kidd  <mrkidd@mrkidd.com>
+
 	* src/gap-metadata.c, src/gap-metadata.h, src/GAPPlayer.c: Add GstTag support (yea!)
 
 2004-03-31  Mason Kidd  <mrkidd@mrkidd.com>

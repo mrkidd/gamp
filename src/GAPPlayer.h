@@ -66,7 +66,7 @@ void gap_pause (GAPPlayer *gp);
 void gap_stop (GAPPlayer *gp);
 void gap_close (GAPPlayer *gp);
 
-void gap_get_metadata (GAPPlayer *gp);
+void gap_get_metadata (GAPPlayer *gp, char **artist, char **title);
 
 long gap_get_time (GAPPlayer *gp);
 void gap_set_time (GAPPlayer *gp, long time);

@@ -314,10 +314,16 @@ void cb_file_open (GtkDialog *dialog, int response_id, GtkWidget parent)
 			playlist_add_pls (uris->data);
 		else
 		{
+			char *t_artist = NULL, *t_title = NULL, *t_format = NULL;
+		
 			gap_open (gamp_gp, uris->data);
-			gap_get_metadata (gamp_gp);
-			update_currently_playing (uris->data, TRUE);
-			playlist_add_item ("", "0:00", uris->data);
+			gap_get_metadata (gamp_gp, &t_artist, &t_title);
+			t_format = g_strdup_printf ("%s - %s", t_artist, t_title);
+			update_currently_playing (t_format, FALSE);
+			playlist_add_item (t_format, "0:00", uris->data);
+			g_free (t_format);
+			g_free (t_artist);
+			g_free (t_title);
 		}
 	}
 	gap_play (gamp_gp);

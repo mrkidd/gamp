@@ -230,12 +230,15 @@ void gap_set_time (GAPPlayer *gp, long time)
 		gst_element_set_state (gp->_priv->pipeline, GST_STATE_PLAYING);
 }
 
-void gap_get_metadata (GAPPlayer *gp)
+void gap_get_metadata (GAPPlayer *gp, char **artist, char **title)
 {
 	GAPMetaData *gapmd;
 
 	gapmd = g_new0 (GAPMetaData, 1);
 	gap_metadata_load (gapmd, gp->_priv->vfsuri);
+	*artist = g_strdup (gapmd->artist);
+	*title = g_strdup (gapmd->title);
+	g_free (gapmd);
 }
 
 static void eos_signal_cb (GstElement *gstelement, GAPPlayer *gp)

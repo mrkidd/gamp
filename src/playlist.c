@@ -58,7 +58,7 @@ void playlist_add_item (char *title, char *time, char *uri)
 	GnomeVFSResult vfs_result;
 	
 	g_print ("Adding: %s\n", uri);
-	if (g_ascii_strcasecmp (title, "") == 0)
+/*	if (g_ascii_strcasecmp (title, "") == 0)
 	{
 		vfs_result = gnome_vfs_get_file_info (uri, &file_info, GNOME_VFS_FILE_INFO_DEFAULT);
 		if (vfs_result == GNOME_VFS_OK)
@@ -69,7 +69,13 @@ void playlist_add_item (char *title, char *time, char *uri)
 		}
 		else
 			g_print ("Unable to get info for: %s\n", uri);
-	}
+	}*/
+	gtk_list_store_append (liststore_playlist, &iter_add);
+	gtk_list_store_set (liststore_playlist, &iter_add,
+				COLUMN_TITLE, title,
+				COLUMN_TIME, time,
+				COLUMN_URI, uri,
+				-1);
 }
 
 void playlist_add_pls (char *uri)
