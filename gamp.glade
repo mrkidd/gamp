@@ -21,6 +21,8 @@
   <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
   <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
   <signal name="delete_event" handler="on_window1_delete_event" last_modification_time="Fri, 10 Oct 2003 17:24:33 GMT"/>
+  <signal name="drag_drop" handler="on_window1_drag_drop" last_modification_time="Fri, 30 Apr 2004 05:19:38 GMT"/>
+  <signal name="drag_data_received" handler="on_window1_drag_data_received" last_modification_time="Fri, 30 Apr 2004 15:13:54 GMT"/>
 
   <child>
     <widget class="GtkVBox" id="vbox1">
@@ -613,6 +615,8 @@
 	      <property name="reorderable">True</property>
 	      <property name="enable_search">True</property>
 	      <signal name="row_activated" handler="on_treeview_playlist_row_activated" last_modification_time="Thu, 30 Oct 2003 02:02:23 GMT"/>
+	      <signal name="drag_drop" handler="on_treeview_playlist_drag_drop" last_modification_time="Mon, 03 May 2004 00:50:34 GMT"/>
+	      <signal name="drag_data_received" handler="on_treeview_playlist_drag_data_received" last_modification_time="Mon, 03 May 2004 00:50:40 GMT"/>
 	    </widget>
 	  </child>
 	</widget>

@@ -1,3 +1,8 @@
+Overview of Changes in Gamp 0.4
+==============================
+* Add DnD support for main window and playlist, drop files onto them to load the files
+* Better error handling support for Gstreamer problems
+
 Overview of Changes in Gamp 0.3
 ===============================
 * Retrieve file metadata via GStreamer
