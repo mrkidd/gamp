@@ -2,6 +2,7 @@
 <!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
 
 <glade-interface>
+<requires lib="gnome"/>
 
 <widget class="GtkWindow" id="window1">
   <property name="visible">True</property>
@@ -13,6 +14,11 @@
   <property name="default_height">100</property>
   <property name="resizable">False</property>
   <property name="destroy_with_parent">False</property>
+  <property name="decorated">True</property>
+  <property name="skip_taskbar_hint">False</property>
+  <property name="skip_pager_hint">False</property>
+  <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
+  <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
   <signal name="delete_event" handler="on_window1_delete_event" last_modification_time="Fri, 10 Oct 2003 17:24:33 GMT"/>
 
   <child>
@@ -28,8 +34,7 @@
 	  <child>
 	    <widget class="GtkMenuItem" id="menuitem1">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">_File</property>
-	      <property name="use_underline">True</property>
+	      <property name="stock_item">GNOMEUIINFO_MENU_FILE_TREE</property>
 
 	      <child>
 		<widget class="GtkMenu" id="menuitem1_menu">
@@ -37,21 +42,8 @@
 		  <child>
 		    <widget class="GtkImageMenuItem" id="open1">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">_Open</property>
-		      <property name="use_underline">True</property>
+		      <property name="stock_item">GNOMEUIINFO_MENU_OPEN_ITEM</property>
 		      <signal name="activate" handler="on_open1_activate" last_modification_time="Fri, 10 Oct 2003 00:51:40 GMT"/>
-
-		      <child internal-child="image">
-			<widget class="GtkImage" id="image16">
-			  <property name="visible">True</property>
-			  <property name="stock">gtk-open</property>
-			  <property name="icon_size">1</property>
-			  <property name="xalign">0.5</property>
-			  <property name="yalign">0.5</property>
-			  <property name="xpad">0</property>
-			  <property name="ypad">0</property>
-			</widget>
-		      </child>
 		    </widget>
 		  </child>
 
@@ -63,7 +55,7 @@
 		      <signal name="activate" handler="on_open_location1_activate" last_modification_time="Mon, 13 Oct 2003 06:47:28 GMT"/>
 
 		      <child internal-child="image">
-			<widget class="GtkImage" id="image17">
+			<widget class="GtkImage" id="image20">
 			  <property name="visible">True</property>
 			  <property name="stock">gtk-open</property>
 			  <property name="icon_size">1</property>
@@ -77,7 +69,7 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkMenuItem" id="separatormenuitem1">
+		    <widget class="GtkSeparatorMenuItem" id="separatormenuitem1">
 		      <property name="visible">True</property>
 		    </widget>
 		  </child>
@@ -85,8 +77,7 @@
 		  <child>
 		    <widget class="GtkImageMenuItem" id="quit1">
 		      <property name="visible">True</property>
-		      <property name="label">gtk-quit</property>
-		      <property name="use_stock">True</property>
+		      <property name="stock_item">GNOMEUIINFO_MENU_EXIT_ITEM</property>
 		      <signal name="activate" handler="on_quit1_activate" last_modification_time="Fri, 10 Oct 2003 00:51:40 GMT"/>
 		    </widget>
 		  </child>
@@ -98,25 +89,22 @@
 	  <child>
 	    <widget class="GtkMenuItem" id="menuitem3">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">_View</property>
-	      <property name="use_underline">True</property>
+	      <property name="stock_item">GNOMEUIINFO_MENU_VIEW_TREE</property>
 	    </widget>
 	  </child>
 
 	  <child>
 	    <widget class="GtkMenuItem" id="menuitem4">
 	      <property name="visible">True</property>
-	      <property name="label" translatable="yes">_Help</property>
-	      <property name="use_underline">True</property>
+	      <property name="stock_item">GNOMEUIINFO_MENU_HELP_TREE</property>
 
 	      <child>
 		<widget class="GtkMenu" id="menuitem4_menu">
 
 		  <child>
-		    <widget class="GtkMenuItem" id="about1">
+		    <widget class="GtkImageMenuItem" id="about1">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="yes">_About</property>
-		      <property name="use_underline">True</property>
+		      <property name="stock_item">GNOMEUIINFO_MENU_ABOUT_ITEM</property>
 		      <signal name="activate" handler="on_about1_activate" last_modification_time="Fri, 10 Oct 2003 00:51:40 GMT"/>
 		    </widget>
 		  </child>
@@ -145,6 +133,10 @@
 	      <property name="yalign">0.5</property>
 	      <property name="xscale">1</property>
 	      <property name="yscale">1</property>
+	      <property name="top_padding">0</property>
+	      <property name="bottom_padding">0</property>
+	      <property name="left_padding">0</property>
+	      <property name="right_padding">0</property>
 
 	      <child>
 		<widget class="GtkDrawingArea" id="drawingarea_time">
@@ -173,11 +165,15 @@
 		  <property name="yalign">0.5</property>
 		  <property name="xscale">1</property>
 		  <property name="yscale">1</property>
+		  <property name="top_padding">0</property>
+		  <property name="bottom_padding">0</property>
+		  <property name="left_padding">0</property>
+		  <property name="right_padding">0</property>
 
 		  <child>
 		    <widget class="GtkLabel" id="label_current_song">
 		      <property name="visible">True</property>
-		      <property name="label" translatable="no">&lt;b&gt;&lt;big&gt;Not Currently Playing&lt;/big&gt;&lt;/b&gt;</property>
+		      <property name="label" translatable="yes">&lt;b&gt;&lt;big&gt;Not Currently Playing&lt;/big&gt;&lt;/b&gt;</property>
 		      <property name="use_underline">False</property>
 		      <property name="use_markup">True</property>
 		      <property name="justify">GTK_JUSTIFY_CENTER</property>
@@ -208,6 +204,7 @@
 		      <property name="visible">True</property>
 		      <property name="can_focus">True</property>
 		      <property name="relief">GTK_RELIEF_NORMAL</property>
+		      <property name="focus_on_click">True</property>
 		      <signal name="clicked" handler="on_button_volume_clicked" last_modification_time="Tue, 21 Oct 2003 02:56:30 GMT"/>
 
 		      <child>
@@ -235,6 +232,7 @@
 		      <property name="visible">True</property>
 		      <property name="can_focus">True</property>
 		      <property name="relief">GTK_RELIEF_NORMAL</property>
+		      <property name="focus_on_click">True</property>
 		      <property name="active">False</property>
 		      <property name="inconsistent">False</property>
 		      <signal name="toggled" handler="on_togglebutton_playlist_toggled" last_modification_time="Tue, 21 Oct 2003 02:56:37 GMT"/>
@@ -288,6 +286,10 @@
 	  <property name="yalign">0.5</property>
 	  <property name="xscale">0.9</property>
 	  <property name="yscale">1</property>
+	  <property name="top_padding">0</property>
+	  <property name="bottom_padding">0</property>
+	  <property name="left_padding">0</property>
+	  <property name="right_padding">0</property>
 
 	  <child>
 	    <widget class="GtkProgressBar" id="progressbar_time">
@@ -313,6 +315,10 @@
 	  <property name="yalign">0.5</property>
 	  <property name="xscale">1</property>
 	  <property name="yscale">1</property>
+	  <property name="top_padding">0</property>
+	  <property name="bottom_padding">0</property>
+	  <property name="left_padding">0</property>
+	  <property name="right_padding">0</property>
 
 	  <child>
 	    <widget class="GtkHBox" id="hbox_control_buttons">
@@ -325,6 +331,7 @@
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <signal name="clicked" handler="on_button_previous_clicked" last_modification_time="Fri, 10 Oct 2003 17:37:51 GMT"/>
 
 		  <child>
@@ -350,6 +357,7 @@
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <signal name="clicked" handler="on_button_play_clicked" last_modification_time="Fri, 10 Oct 2003 17:37:57 GMT"/>
 
 		  <child>
@@ -375,6 +383,7 @@
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <signal name="clicked" handler="on_button_pause_clicked" last_modification_time="Fri, 10 Oct 2003 17:38:08 GMT"/>
 
 		  <child>
@@ -400,6 +409,7 @@
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <signal name="clicked" handler="on_button_stop_clicked" last_modification_time="Fri, 10 Oct 2003 17:38:12 GMT"/>
 
 		  <child>
@@ -425,6 +435,7 @@
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <signal name="clicked" handler="on_button_next_clicked" last_modification_time="Fri, 10 Oct 2003 17:38:16 GMT"/>
 
 		  <child>
@@ -450,6 +461,7 @@
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <signal name="clicked" handler="on_button_eject_clicked" last_modification_time="Fri, 10 Oct 2003 17:38:16 GMT"/>
 
 		  <child>
@@ -475,6 +487,7 @@
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <signal name="toggled" handler="on_togglebutton_shuffle_toggled" last_modification_time="Fri, 10 Oct 2003 17:38:27 GMT"/>
@@ -502,6 +515,7 @@
 		  <property name="visible">True</property>
 		  <property name="can_focus">True</property>
 		  <property name="relief">GTK_RELIEF_NORMAL</property>
+		  <property name="focus_on_click">True</property>
 		  <property name="active">False</property>
 		  <property name="inconsistent">False</property>
 		  <signal name="toggled" handler="on_togglebutton_repeat_toggled" last_modification_time="Fri, 10 Oct 2003 17:38:31 GMT"/>
@@ -543,6 +557,11 @@
   <property name="modal">False</property>
   <property name="resizable">True</property>
   <property name="destroy_with_parent">False</property>
+  <property name="decorated">True</property>
+  <property name="skip_taskbar_hint">False</property>
+  <property name="skip_pager_hint">False</property>
+  <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
+  <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
   <signal name="delete_event" handler="on_window_playlist_delete_event" last_modification_time="Mon, 13 Oct 2003 02:38:49 GMT"/>
 
   <child>
@@ -553,11 +572,12 @@
 
       <child>
 	<widget class="GtkScrolledWindow" id="scrolledwindow_playlist">
+	  <property name="border_width">6</property>
 	  <property name="visible">True</property>
 	  <property name="can_focus">True</property>
 	  <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
 	  <property name="vscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
-	  <property name="shadow_type">GTK_SHADOW_NONE</property>
+	  <property name="shadow_type">GTK_SHADOW_ETCHED_IN</property>
 	  <property name="window_placement">GTK_CORNER_TOP_LEFT</property>
 
 	  <child>
@@ -581,19 +601,20 @@
 
       <child>
 	<widget class="GtkHButtonBox" id="hbuttonbox1">
-	  <property name="border_width">3</property>
+	  <property name="border_width">6</property>
 	  <property name="visible">True</property>
 	  <property name="layout_style">GTK_BUTTONBOX_DEFAULT_STYLE</property>
-	  <property name="spacing">4</property>
+	  <property name="spacing">6</property>
 
 	  <child>
 	    <widget class="GtkButton" id="button_add">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
 	      <property name="can_focus">True</property>
-	      <property name="label" translatable="yes">Add</property>
-	      <property name="use_underline">True</property>
+	      <property name="label">gtk-add</property>
+	      <property name="use_stock">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
 	      <signal name="clicked" handler="on_button_add_clicked" last_modification_time="Thu, 30 Oct 2003 01:53:21 GMT"/>
 	    </widget>
 	  </child>
@@ -603,9 +624,10 @@
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
 	      <property name="can_focus">True</property>
-	      <property name="label" translatable="yes">Remove</property>
-	      <property name="use_underline">True</property>
+	      <property name="label">gtk-remove</property>
+	      <property name="use_stock">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
 	      <signal name="clicked" handler="on_button_remove_clicked" last_modification_time="Thu, 30 Oct 2003 01:54:03 GMT"/>
 	    </widget>
 	  </child>
@@ -615,9 +637,10 @@
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
 	      <property name="can_focus">True</property>
-	      <property name="label" translatable="yes">Load</property>
-	      <property name="use_underline">True</property>
+	      <property name="label">gtk-open</property>
+	      <property name="use_stock">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
 	      <signal name="clicked" handler="on_button_open_clicked" last_modification_time="Thu, 30 Oct 2003 01:53:58 GMT"/>
 	    </widget>
 	  </child>
@@ -627,9 +650,10 @@
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
 	      <property name="can_focus">True</property>
-	      <property name="label" translatable="yes">Save</property>
-	      <property name="use_underline">True</property>
+	      <property name="label">gtk-save</property>
+	      <property name="use_stock">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
 	      <signal name="clicked" handler="on_button_save_clicked" last_modification_time="Thu, 30 Oct 2003 01:53:52 GMT"/>
 	    </widget>
 	  </child>
@@ -639,9 +663,10 @@
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
 	      <property name="can_focus">True</property>
-	      <property name="label" translatable="yes">Clear</property>
-	      <property name="use_underline">True</property>
+	      <property name="label">gtk-clear</property>
+	      <property name="use_stock">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
+	      <property name="focus_on_click">True</property>
 	      <signal name="clicked" handler="on_button_clear_clicked" last_modification_time="Thu, 30 Oct 2003 01:53:47 GMT"/>
 	    </widget>
 	  </child>

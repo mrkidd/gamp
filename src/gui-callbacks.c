@@ -20,6 +20,7 @@
  */
 #include <gnome.h>
 #include <glade/glade.h>
+#include <libgnomeui/gnome-about.h>
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-mime-utils.h>
 #include <libgnomevfs/gnome-vfs-utils.h>
@@ -142,6 +143,44 @@ void on_quit1_activate (GtkMenuItem *menuitem, gpointer user_data)
 
 void on_about1_activate (GtkMenuItem *menuitem, gpointer user_data)
 {
+	static GtkWidget *about = NULL;
+	gchar *filename;
+	GdkPixbuf *pixbuf = NULL;
+	const gchar *authors[] = {
+		"Mason Kidd <mrkidd@mrkidd.com>",
+		NULL
+	};
+	const gchar *documenters[] = {
+		NULL
+	};
+	const gchar *translators = _("translator_credits");
+	const gchar *copyright = "Copyright \xc2\xa9 2004 Mason Kidd";
+	
+	if (about != NULL)
+	{
+		gtk_window_present (GTK_WINDOW (about));
+		return;
+	}
+
+	filename = gnome_program_locate_file (NULL, GNOME_FILE_DOMAIN_PIXMAP,
+				"gamp.png", TRUE, NULL);
+	if (filename != NULL)
+	{
+		pixbuf = gdk_pixbuf_new_from_file (filename, NULL);
+		g_free (filename);
+	}
+
+	about = gnome_about_new (PACKAGE, VERSION, copyright,
+			_("A music player for Gnome using the Gstreamer libraries"),
+			authors, documenters,
+			strcmp (translators, "translator_credits") != 0 ? translators : NULL,
+			pixbuf);
+	if (pixbuf != NULL)
+		g_object_unref (pixbuf);
+
+	gtk_window_set_transient_for (GTK_WINDOW (about), GTK_WINDOW (main_window));
+	g_signal_connect (G_OBJECT (about), "destroy", G_CALLBACK (gtk_widget_destroyed), &about);
+	gtk_widget_show (about);
 }
 
 gboolean on_window1_delete_event (GtkWidget *widget, GdkEvent *event, gpointer user_data)

@@ -1,0 +1,11 @@
+POTFILES
+Makefile.in.in
+Makefile.in
+Makefile
+*.gmo
+*.mo
+*.pot
+messages
+missing
+.intltool-merge-cache
+
