@@ -1,0 +1,2 @@
+Gamp is a clean/simple audio player for Gnome. It is written in C and uses the Gstreamer framework for audio playback.
+It supports MP3, Ogg Vorbis, and Flac. It's interface is similar to that of Winamp, Freeamp, or XMMS.
